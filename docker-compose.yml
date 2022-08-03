@@ -7,11 +7,18 @@ services:
     tty: true
     ports:
       - "3000:3000"
+    environment:
+      DB_HOST: $DB_HOST
+      DB_NAME: $DB_NAME
+      DB_ROOT_PASS: $DB_ROOT_PASS
+      DB_USER: $DB_USER
+      DB_PASS: $DB_PASS
+
   db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
       MYSQL_DATABASE: $DB_NAME
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASS
       TZ: 'Asia/Tokyo'
