@@ -17,7 +17,7 @@ export class Todo {
   title: string
 
   @Column()
-  remark: string
+  content: string
 
   @CreateDateColumn()
   createdAt: Date
