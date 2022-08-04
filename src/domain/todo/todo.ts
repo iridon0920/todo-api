@@ -45,11 +45,11 @@ export class Todo {
     return this.updatedAt
   }
 
-  setTitle(title: Title) {
+  changeTitle(title: Title) {
     this.title = title
   }
 
-  setContent(content: Content) {
+  changeContent(content: Content) {
     this.content = content
   }
 }

@@ -29,8 +29,8 @@ describe('Todoエンティティ', () => {
       new Date('2022-08-04'),
     )
 
-    todo.setTitle(new Title('タスクC'))
-    todo.setContent(new Content('説明文説明文説明文'))
+    todo.changeTitle(new Title('タスクC'))
+    todo.changeContent(new Content('説明文説明文説明文'))
 
     expect(todo.getTitle().toString()).toBe('タスクC')
     expect(todo.getContent().toString()).toBe('説明文説明文説明文')
