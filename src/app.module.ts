@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common'
-import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserModel } from './model/user.model'
 import { TodoModel } from './model/todo.model'
-import { UsersController } from './controller/users.controller'
+import { ControllerModule } from './controller/controller.module'
 
 @Module({
   imports: [
@@ -17,8 +16,7 @@ import { UsersController } from './controller/users.controller'
       entities: [UserModel, TodoModel],
       synchronize: true,
     }),
+    ControllerModule,
   ],
-  controllers: [UsersController],
-  providers: [AppService],
 })
 export class AppModule {}

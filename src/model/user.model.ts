@@ -19,6 +19,9 @@ export class UserModel {
   @Column()
   name: string
 
+  @Column()
+  password: string
+
   @CreateDateColumn()
   createdAt: Date
 

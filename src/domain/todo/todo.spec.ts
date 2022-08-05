@@ -12,8 +12,6 @@ describe('Todoエンティティ', () => {
     1,
     new Email('test@example.com'),
     new UserName('田中　太郎'),
-    new Date('2022-07-15'),
-    new Date('2022-08-04'),
   )
 
   it('コンストラクタから値をセットして、各値を参照できる', () => {
