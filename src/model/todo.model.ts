@@ -2,22 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Todo } from './todo.entity'
+import { UserModel } from './user.model'
 
-@Entity()
-export class User {
+@Entity('todo')
+export class TodoModel {
   @PrimaryGeneratedColumn()
   id: number
 
   @Column()
-  email: string
+  title: string
 
   @Column()
-  name: string
+  content: string
 
   @CreateDateColumn()
   createdAt: Date
@@ -25,6 +25,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @OneToMany(() => Todo, (todo) => todo.user)
-  todos: Todo[]
+  @ManyToOne(() => UserModel, (user) => user.todos)
+  user: UserModel
 }
