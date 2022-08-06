@@ -6,7 +6,7 @@ import { Email } from './value-object/email'
  */
 export class User {
   private readonly id: number
-  private email: Email
+  private readonly email: Email
   private name: UserName
 
   constructor(id: number, email: Email, name: UserName) {
@@ -25,10 +25,6 @@ export class User {
 
   getName() {
     return this.name
-  }
-
-  changeEmail(email: Email) {
-    this.email = email
   }
 
   changeName(name: UserName) {

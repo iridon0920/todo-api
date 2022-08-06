@@ -15,17 +15,14 @@ describe('ユーザエンティティ', () => {
     expect(user.getName().toString()).toBe('田中　太郎')
   })
 
-  it('メールアドレスとユーザ名は値を変更できる', () => {
+  it('ユーザ名は値を変更できる', () => {
     const user = new User(
       2,
       new Email('shiken@example.com'),
       new UserName('鈴木　次郎'),
     )
 
-    user.changeEmail(new Email('check@example.com'))
     user.changeName(new UserName('鈴木　ジロウ'))
-
-    expect(user.getEmail().toString()).toBe('check@example.com')
     expect(user.getName().toString()).toBe('鈴木　ジロウ')
   })
 })
