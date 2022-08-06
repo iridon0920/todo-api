@@ -3,6 +3,7 @@ import { UserModel } from '../model/user.model'
 import { Repository } from 'typeorm'
 import { User } from '../domain/user/user'
 import { convertToUserModel } from '../domain/user/function/convert-to-user-model'
+import { Password } from '../domain/user/value-object/password'
 
 export class UsersRepository {
   constructor(
@@ -10,11 +11,11 @@ export class UsersRepository {
     private readonly repository: Repository<UserModel>,
   ) {}
 
-  async save(user: User, hashPassword?: string) {
+  async save(user: User, password?: Password) {
     const userModel = convertToUserModel(user)
 
-    if (hashPassword) {
-      userModel.password = hashPassword
+    if (password) {
+      userModel.password = await password.getHash()
     }
 
     return await this.repository.save(userModel)

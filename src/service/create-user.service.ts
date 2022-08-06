@@ -3,8 +3,8 @@ import { UsersRepository } from '../repository/users.repository'
 import { User } from '../domain/user/user'
 import { Email } from '../domain/user/value-object/email'
 import { UserName } from '../domain/user/value-object/user-name'
-import * as bcrypt from 'bcrypt'
 import { CreateUserParam } from '../dto/create-user-param'
+import { Password } from '../domain/user/value-object/password'
 
 @Injectable()
 export class CreateUserService {
@@ -23,10 +23,9 @@ export class CreateUserService {
       new Email(param.email),
       new UserName(param.name),
     )
+    const password = new Password(param.password)
 
-    const hashPassword = await bcrypt.hash(param.password, 10)
-
-    await this.usersRepository.save(user, hashPassword)
+    await this.usersRepository.save(user, password)
 
     return user
   }
