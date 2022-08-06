@@ -4,4 +4,4 @@ WORKDIR /app
 
 RUN npm i -g @nestjs/cli
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:dev"]
