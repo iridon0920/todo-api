@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { CreateUserService } from '../service/create-user.service'
-import { CreateUserParam } from '../dto/create-user-param'
 import { convertToUserResponse } from '../domain/user/function/convert-to-user-response'
-import { UserResponse } from '../dto/user-response'
+import { UserResponse } from '../dto/response/user/user-response'
+import { CreateUserParam } from '../dto/request/user/create-user-param'
 
 @Controller('users')
 export class UsersController {

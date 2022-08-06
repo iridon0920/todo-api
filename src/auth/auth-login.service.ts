@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserModel } from '../model/user.model'
 import { Repository } from 'typeorm'
-import { LoginUserParam } from '../dto/login-user-param'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
+import { AuthLoginParam } from '../dto/request/auth/auth-login-param'
 
 @Injectable()
 export class AuthLoginService {
@@ -14,11 +14,14 @@ export class AuthLoginService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(param: LoginUserParam) {
+  async execute(param: AuthLoginParam) {
     const userModel = await this.authUserRepository.findOne({
       where: { email: param.email },
     })
-    if (await bcrypt.compare(param.password, userModel.password)) {
+    if (
+      userModel !== null &&
+      (await bcrypt.compare(param.password, userModel.password))
+    ) {
       return this.jwtService.sign({
         userId: userModel.id,
         email: userModel.email,

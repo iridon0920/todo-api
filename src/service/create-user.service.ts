@@ -3,8 +3,8 @@ import { UsersRepository } from '../repository/users.repository'
 import { User } from '../domain/user/user'
 import { Email } from '../domain/user/value-object/email'
 import { UserName } from '../domain/user/value-object/user-name'
-import { CreateUserParam } from '../dto/create-user-param'
 import { Password } from '../domain/user/value-object/password'
+import { CreateUserParam } from '../dto/request/user/create-user-param'
 
 @Injectable()
 export class CreateUserService {
