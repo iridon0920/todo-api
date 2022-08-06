@@ -18,14 +18,14 @@ export class UsersRepository {
       userModel.password = await password.getHash()
     }
 
-    return await this.repository.save(userModel)
+    await this.repository.save(userModel)
   }
 
-  async count() {
-    return await this.repository.count()
+  count() {
+    return this.repository.count()
   }
 
-  async findEmail(email: string) {
-    return await this.repository.find({ where: { email } })
+  findEmail(email: string) {
+    return this.repository.find({ where: { email } })
   }
 }
