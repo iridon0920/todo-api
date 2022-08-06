@@ -39,4 +39,31 @@ describe('UsersController (e2e)', () => {
       .expect(201)
       .expect({ id: 1, email: 'test@example.com', name: 'テスト' })
   })
+
+  it('ユーザ作成失敗（メール重複） - /users (POST)', () => {
+    return request(app.getHttpServer())
+      .post('/users')
+      .send({
+        email: 'test@example.com',
+        name: 'テスト',
+        password: 'password',
+      })
+      .expect(400)
+      .expect({ statusCode: 400, message: 'メールアドレスが重複しています。' })
+  })
+
+  it('ユーザ作成失敗（入力内容不備） - /users (POST)', () => {
+    return request(app.getHttpServer())
+      .post('/users')
+      .send({
+        email: 'hoge@example.com',
+        name: 'hoge',
+        password: 'pass',
+      })
+      .expect(400)
+      .expect({
+        statusCode: 400,
+        message: 'パスワードの長さは8文字以上にしてください。',
+      })
+  })
 })
