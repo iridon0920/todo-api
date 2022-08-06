@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common'
 import { CreateUserService } from '../service/create-user.service'
 import { CreateUserParam } from '../dto/create-user-param'
 import { UserResponse } from '../dto/user-response'
+import { convertToUserResponse } from '../domain/user/function/convert-to-user-response'
 
 @Controller('users')
 export class UsersController {
@@ -9,6 +10,7 @@ export class UsersController {
 
   @Post()
   async create(@Body() param: CreateUserParam): Promise<UserResponse> {
-    return await this.createUserService.execute(param)
+    const user = await this.createUserService.execute(param)
+    return convertToUserResponse(user)
   }
 }

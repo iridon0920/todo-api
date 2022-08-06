@@ -5,8 +5,6 @@ import { Email } from '../domain/user/value-object/email'
 import { UserName } from '../domain/user/value-object/user-name'
 import * as bcrypt from 'bcrypt'
 import { CreateUserParam } from '../dto/create-user-param'
-import { convertToUserResponse } from '../domain/user/function/convert-to-user-response'
-import { convertToUserModel } from '../domain/user/function/convert-to-user-model'
 
 @Injectable()
 export class CreateUserService {
@@ -26,12 +24,11 @@ export class CreateUserService {
       new UserName(param.name),
     )
 
-    const userModel = convertToUserModel(user)
     const hashPassword = await bcrypt.hash(param.password, 10)
 
-    await this.usersRepository.save(userModel, hashPassword)
+    await this.usersRepository.save(user, hashPassword)
 
-    return convertToUserResponse(user)
+    return user
   }
 
   private async existsEmail(email: string) {

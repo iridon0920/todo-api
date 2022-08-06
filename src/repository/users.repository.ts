@@ -1,6 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserModel } from '../model/user.model'
 import { Repository } from 'typeorm'
+import { User } from '../domain/user/user'
+import { convertToUserModel } from '../domain/user/function/convert-to-user-model'
 
 export class UsersRepository {
   constructor(
@@ -8,10 +10,13 @@ export class UsersRepository {
     private readonly repository: Repository<UserModel>,
   ) {}
 
-  async save(userModel: UserModel, hashPassword?: string) {
+  async save(user: User, hashPassword?: string) {
+    const userModel = convertToUserModel(user)
+
     if (hashPassword) {
       userModel.password = hashPassword
     }
+
     return await this.repository.save(userModel)
   }
 
