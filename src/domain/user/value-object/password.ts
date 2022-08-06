@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt'
+import { HttpException, HttpStatus } from '@nestjs/common'
 
 /**
  * パスワードの最低文字数
@@ -10,8 +11,9 @@ export class Password {
 
   constructor(value: string) {
     if (value.length < PASSWORD_LENGTH_LOW_LIMIT) {
-      throw new Error(
+      throw new HttpException(
         `パスワードの長さは${PASSWORD_LENGTH_LOW_LIMIT}文字以上にしてください。`,
+        HttpStatus.BAD_REQUEST,
       )
     }
     this.value = value

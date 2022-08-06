@@ -1,6 +1,8 @@
 /**
  * ユーザ名の最大文字数
  */
+import { HttpException, HttpStatus } from '@nestjs/common'
+
 const USER_NAME_LENGTH_LIMIT = 30
 
 export class UserName {
@@ -8,8 +10,9 @@ export class UserName {
 
   constructor(value: string) {
     if (value.length > USER_NAME_LENGTH_LIMIT) {
-      throw new Error(
+      throw new HttpException(
         `ユーザ名の長さは${USER_NAME_LENGTH_LIMIT}文字以内にしてください。`,
+        HttpStatus.BAD_REQUEST,
       )
     }
     this.value = value
