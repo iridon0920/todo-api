@@ -29,6 +29,7 @@ describe('TodosController (e2e)', () => {
         id: 1,
         title: 'ミルクを買う',
         content: '近所のスーパーで買うこと。',
+        userId: 1,
       })
   })
 })

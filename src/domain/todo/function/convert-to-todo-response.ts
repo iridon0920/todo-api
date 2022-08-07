@@ -6,5 +6,6 @@ export const convertToTodoResponse = (todo: Todo): TodoResponse => {
     id: todo.getId(),
     title: todo.getTitle(),
     content: todo.getContent(),
+    userId: todo.getUserId(),
   }
 }

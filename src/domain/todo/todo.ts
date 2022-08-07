@@ -1,4 +1,3 @@
-import { User } from '../user/user'
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 // タイトルの最低文字数
@@ -18,15 +17,15 @@ export class Todo {
   private readonly id: number
   private title: string
   private content: string
-  private readonly user: User
+  private readonly userId: number
 
-  constructor(id: number, title: string, content: string, user: User) {
+  constructor(id: number, title: string, content: string, userId: number) {
     this.validateValue(title, content)
 
     this.id = id
     this.title = title
     this.content = content
-    this.user = user
+    this.userId = userId
   }
 
   getId() {
@@ -41,8 +40,8 @@ export class Todo {
     return this.content
   }
 
-  getUser() {
-    return this.user
+  getUserId() {
+    return this.userId
   }
 
   changeTitle(title: string) {

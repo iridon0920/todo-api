@@ -5,4 +5,5 @@ export interface TodoResponse {
   id: number
   title: string
   content: string
+  userId: number
 }

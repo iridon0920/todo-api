@@ -12,12 +12,11 @@ export class CreateTodoService {
   ) {}
 
   async execute(userId: number, param: CreateTodoParam) {
-    const user = await this.usersRepository.findById(userId)
     const todo = new Todo(
       await this.getNewTodoId(),
       param.title,
       param.content,
-      user,
+      userId,
     )
 
     await this.todoRepository.save(todo)

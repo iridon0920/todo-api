@@ -12,6 +12,9 @@ export class TodoModel {
   @Column()
   content: string
 
+  @Column()
+  userId: number
+
   @ManyToOne(() => UserModel, (user) => user.todos)
   user: UserModel
 }

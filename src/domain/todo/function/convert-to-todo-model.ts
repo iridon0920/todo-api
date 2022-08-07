@@ -1,6 +1,5 @@
 import { Todo } from '../todo'
 import { TodoModel } from '../../../model/todo.model'
-import { convertToUserModel } from '../../user/function/convert-to-user-model'
 
 export const convertToTodoModel = (todo: Todo) => {
   const todoModel = new TodoModel()
@@ -8,7 +7,7 @@ export const convertToTodoModel = (todo: Todo) => {
   todoModel.id = todo.getId()
   todoModel.title = todo.getTitle()
   todoModel.content = todo.getContent()
-  todoModel.user = convertToUserModel(todo.getUser())
+  todoModel.userId = todo.getUserId()
 
   return todoModel
 }
