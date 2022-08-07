@@ -9,6 +9,8 @@ describe('TodosController (e2e)', () => {
   let app: INestApplication
   let moduleFixture: TestingModule
   let jwtToken: string
+  // 2つ目のユーザのトークン
+  let jwtToken2: string
 
   beforeAll(async () => {
     moduleFixture = await getTestModule()
@@ -64,15 +66,46 @@ describe('TodosController (e2e)', () => {
         email: 'test2@example.com',
         password: 'password',
       })
-    const user2Token = loginResponse.body.access_token
+    jwtToken2 = loginResponse.body.access_token
 
     // 新規ユーザで作成済Todoの更新リクエスト
     return request(app.getHttpServer())
       .patch('/todos/1')
-      .set('Authorization', `Bearer ${user2Token}`)
+      .set('Authorization', `Bearer ${jwtToken2}`)
       .send({
         title: '豚肉を買う',
       })
       .expect(401)
+  })
+
+  it('Todoの参照 - /todos/:id (Get)', () => {
+    // PATCHのテストで更新したTodoを取得
+    return request(app.getHttpServer())
+      .get('/todos/1')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(200)
+      .expect({
+        id: 1,
+        title: '卵を買う',
+        content: '近所のスーパーで買うこと。',
+        userId: 1,
+      })
+  })
+
+  it('Todoの参照（別ユーザでも参照可能） - /todos/:id (Get)', () => {
+    return request(app.getHttpServer())
+      .get('/todos/1')
+      .set('Authorization', `Bearer ${jwtToken2}`)
+      .expect(200)
+      .expect({
+        id: 1,
+        title: '卵を買う',
+        content: '近所のスーパーで買うこと。',
+        userId: 1,
+      })
+  })
+
+  it('Todoの参照失敗（認証なしでは取得不可） - /todos/:id (Get)', () => {
+    return request(app.getHttpServer()).get('/todos/1').expect(401)
   })
 })

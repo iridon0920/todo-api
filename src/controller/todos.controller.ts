@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,12 +17,14 @@ import { AuthUserParam } from '../dto/request/auth/auth-user-param'
 import { convertToTodoResponse } from '../domain/todo/function/convert-to-todo-response'
 import { UpdateTodoParam } from '../dto/request/todo/update-todo-param'
 import { UpdateTodoService } from '../service/todo/update-todo.service'
+import { GetTodoService } from '../service/todo/get-todo.service'
 
 @Controller('todos')
 export class TodosController {
   constructor(
     private readonly createTodoService: CreateTodoService,
     private readonly updateTodoService: UpdateTodoService,
+    private readonly getTodoService: GetTodoService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -49,6 +52,13 @@ export class TodosController {
       param,
       request.user.userId,
     )
+    return convertToTodoResponse(todo)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async get(@Param('id', ParseIntPipe) id: number): Promise<TodoResponse> {
+    const todo = await this.getTodoService.execute(id)
     return convertToTodoResponse(todo)
   }
 }
