@@ -15,6 +15,7 @@ export class UserRepository {
 
   async findById(userId: number) {
     const userModel = await this.repository.findOne({ where: { id: userId } })
+
     if (userModel === null) {
       throw new HttpException('ユーザが見つかりません。', HttpStatus.NOT_FOUND)
     }
