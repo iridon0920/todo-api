@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { UsersRepository } from '../repository/users.repository'
-import { UpdateUserParam } from '../dto/request/user/update-user-param'
+import { UsersRepository } from '../../repository/users.repository'
+import { UpdateUserParam } from '../../dto/request/user/update-user-param'
 
 @Injectable()
 export class UpdateUserService {

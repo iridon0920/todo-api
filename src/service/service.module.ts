@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
-import { CreateUserService } from './create-user.service'
 import { RepositoryModule } from '../repository/repository.module'
-import { UpdateUserService } from './update-user.service'
-import { DeleteUserService } from './delete-user.service'
+import { CreateUserService } from './user/create-user.service'
+import { UpdateUserService } from './user/update-user.service'
+import { DeleteUserService } from './user/delete-user.service'
 
 @Module({
   imports: [RepositoryModule],
