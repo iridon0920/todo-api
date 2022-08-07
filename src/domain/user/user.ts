@@ -1,5 +1,10 @@
-import { UserName } from './value-object/user-name'
+import { HttpException, HttpStatus } from '@nestjs/common'
 import { Email } from './value-object/email'
+
+/**
+ * ユーザ名の最大文字数
+ */
+const USER_NAME_LENGTH_LIMIT = 30
 
 /**
  * ユーザエンティティクラス
@@ -7,9 +12,16 @@ import { Email } from './value-object/email'
 export class User {
   private readonly id: number
   private readonly email: Email
-  private name: UserName
+  private name: string
 
-  constructor(id: number, email: Email, name: UserName) {
+  constructor(id: number, email: Email, name: string) {
+    if (name.length > USER_NAME_LENGTH_LIMIT) {
+      throw new HttpException(
+        `ユーザ名の長さは${USER_NAME_LENGTH_LIMIT}文字以内にしてください。`,
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+
     this.id = id
     this.email = email
     this.name = name
@@ -27,7 +39,7 @@ export class User {
     return this.name
   }
 
-  changeName(name: UserName) {
+  changeName(name: string) {
     this.name = name
   }
 }

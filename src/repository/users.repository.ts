@@ -6,7 +6,6 @@ import { convertToUserModel } from '../domain/user/function/convert-to-user-mode
 import { Password } from '../domain/user/value-object/password'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { Email } from '../domain/user/value-object/email'
-import { UserName } from '../domain/user/value-object/user-name'
 
 export class UsersRepository {
   constructor(
@@ -20,11 +19,7 @@ export class UsersRepository {
       throw new HttpException('ユーザが見つかりません。', HttpStatus.NOT_FOUND)
     }
 
-    return new User(
-      userModel.id,
-      new Email(userModel.email),
-      new UserName(userModel.name),
-    )
+    return new User(userModel.id, new Email(userModel.email), userModel.name)
   }
 
   async save(user: User, password?: Password) {
