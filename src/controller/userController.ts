@@ -17,8 +17,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { AuthUserParam } from '../dto/request/auth/auth-user-param'
 import { DeleteUserService } from '../service/delete-user.service'
 
-@Controller('users')
-export class UsersController {
+@Controller('user')
+export class UserController {
   constructor(
     private readonly createUserService: CreateUserService,
     private readonly updateUserService: UpdateUserService,

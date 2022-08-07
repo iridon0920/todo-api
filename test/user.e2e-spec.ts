@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserModel } from '../src/model/user.model'
 import { TodoModel } from '../src/model/todo.model'
 
-describe('UsersController (e2e)', () => {
+describe('UserController (e2e)', () => {
   let app: INestApplication
   let moduleFixture: TestingModule
   let jwtToken: string
@@ -29,9 +29,9 @@ describe('UsersController (e2e)', () => {
     await app.init()
   })
 
-  it('ユーザ作成 - /users (POST)', () => {
+  it('新規ユーザ作成 - /user (POST)', () => {
     return request(app.getHttpServer())
-      .post('/users')
+      .post('/user')
       .send({
         email: 'test@example.com',
         name: 'テスト',
@@ -41,9 +41,9 @@ describe('UsersController (e2e)', () => {
       .expect({ id: 1, email: 'test@example.com', name: 'テスト' })
   })
 
-  it('ユーザ作成失敗（メール重複） - /users (POST)', () => {
+  it('ユーザ作成失敗（メール重複） - /user (POST)', () => {
     return request(app.getHttpServer())
-      .post('/users')
+      .post('/user')
       .send({
         email: 'test@example.com',
         name: 'テスト',
@@ -53,9 +53,9 @@ describe('UsersController (e2e)', () => {
       .expect({ statusCode: 400, message: 'メールアドレスが重複しています。' })
   })
 
-  it('ユーザ作成失敗（入力内容不備） - /users (POST)', () => {
+  it('ユーザ作成失敗（入力内容不備） - /user (POST)', () => {
     return request(app.getHttpServer())
-      .post('/users')
+      .post('/user')
       .send({
         email: 'hoge@example.com',
         name: 'hoge',
@@ -68,7 +68,7 @@ describe('UsersController (e2e)', () => {
       })
   })
 
-  it('ユーザ情報を更新 - /users (PATCH)', async () => {
+  it('認証ユーザ情報を更新 - /user (PATCH)', async () => {
     // テストで作成したユーザでログインしてJWT取得
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
@@ -79,7 +79,7 @@ describe('UsersController (e2e)', () => {
     jwtToken = loginResponse.body.access_token
 
     return request(app.getHttpServer())
-      .patch('/users')
+      .patch('/user')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
         name: 'test',
@@ -88,9 +88,9 @@ describe('UsersController (e2e)', () => {
       .expect({ id: 1, email: 'test@example.com', name: 'test' })
   })
 
-  it('ユーザを削除 - /users (DELETE)', async () => {
+  it('認証ユーザを削除 - /user (DELETE)', async () => {
     await request(app.getHttpServer())
-      .delete('/users')
+      .delete('/user')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send()
       .expect(200)
