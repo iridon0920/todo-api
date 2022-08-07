@@ -18,25 +18,14 @@ export class Todo {
   private readonly id: number
   private title: string
   private content: string
-  private readonly createdAt: Date
-  private readonly updatedAt: Date
   private readonly user: User
 
-  constructor(
-    id: number,
-    title: string,
-    content: string,
-    createdAt: Date,
-    updatedAt: Date,
-    user: User,
-  ) {
+  constructor(id: number, title: string, content: string, user: User) {
     this.validateValue(title, content)
 
     this.id = id
     this.title = title
     this.content = content
-    this.createdAt = createdAt
-    this.updatedAt = updatedAt
     this.user = user
   }
 
@@ -50,14 +39,6 @@ export class Todo {
 
   getContent() {
     return this.content
-  }
-
-  getCreatedAt() {
-    return this.createdAt
-  }
-
-  getUpdatedAt() {
-    return this.updatedAt
   }
 
   getUser() {
