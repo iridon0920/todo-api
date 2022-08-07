@@ -1,5 +1,5 @@
 import { User } from '../user'
-import { UserResponse } from '../../../dto/user-response'
+import { UserResponse } from '../../../dto/response/user/user-response'
 
 /**
  * ユーザエンティティをレスポンス用データに変換する

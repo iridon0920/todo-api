@@ -66,4 +66,24 @@ describe('UsersController (e2e)', () => {
         message: 'パスワードの長さは8文字以上にしてください。',
       })
   })
+
+  it('ユーザ情報を更新 - /users (PATCH)', async () => {
+    // テストで作成したユーザでログインしてJWT取得
+    const loginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: 'test@example.com',
+        password: 'password',
+      })
+    const jwtToken = loginResponse.body.access_token
+
+    return request(app.getHttpServer())
+      .patch('/users')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        name: 'test',
+      })
+      .expect(200)
+      .expect({ id: 1, email: 'test@example.com', name: 'test' })
+  })
 })
