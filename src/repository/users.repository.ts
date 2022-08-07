@@ -37,6 +37,10 @@ export class UsersRepository {
     await this.repository.save(userModel)
   }
 
+  async delete(userId: number) {
+    await this.repository.delete(userId)
+  }
+
   count() {
     return this.repository.count()
   }

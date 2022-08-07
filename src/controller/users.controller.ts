@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Patch,
   Post,
   Request,
@@ -14,12 +15,14 @@ import { UpdateUserParam } from '../dto/request/user/update-user-param'
 import { UpdateUserService } from '../service/update-user.service'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { AuthUserParam } from '../dto/request/auth/auth-user-param'
+import { DeleteUserService } from '../service/delete-user.service'
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly createUserService: CreateUserService,
     private readonly updateUserService: UpdateUserService,
+    private readonly deleteUserService: DeleteUserService,
   ) {}
 
   @Post()
@@ -39,5 +42,11 @@ export class UsersController {
       param,
     )
     return convertToUserResponse(user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async delete(@Request() request: AuthUserParam) {
+    await this.deleteUserService.execute(request.user.userId)
   }
 }

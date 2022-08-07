@@ -9,6 +9,7 @@ import { TodoModel } from '../src/model/todo.model'
 describe('UsersController (e2e)', () => {
   let app: INestApplication
   let moduleFixture: TestingModule
+  let jwtToken: string
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
@@ -75,7 +76,7 @@ describe('UsersController (e2e)', () => {
         email: 'test@example.com',
         password: 'password',
       })
-    const jwtToken = loginResponse.body.access_token
+    jwtToken = loginResponse.body.access_token
 
     return request(app.getHttpServer())
       .patch('/users')
@@ -85,5 +86,23 @@ describe('UsersController (e2e)', () => {
       })
       .expect(200)
       .expect({ id: 1, email: 'test@example.com', name: 'test' })
+  })
+
+  it('ユーザを削除 - /users (DELETE)', async () => {
+    await request(app.getHttpServer())
+      .delete('/users')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send()
+      .expect(200)
+      .expect({})
+
+    // 削除済ユーザでログインしても失敗する
+    return request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: 'test@example.com',
+        password: 'password',
+      })
+      .expect(401)
   })
 })
