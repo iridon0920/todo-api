@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { TodoRepository } from '../../repository/todo.repository'
 import { CreateTodoParam } from '../../dto/request/todo/create-todo-param'
 import { Todo } from '../../domain/todo/todo'
-import { UsersRepository } from '../../repository/users.repository'
+import { UserRepository } from '../../repository/user.repository'
 
 @Injectable()
 export class CreateTodoService {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly usersRepository: UserRepository,
     private readonly todoRepository: TodoRepository,
   ) {}
 

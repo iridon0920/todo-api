@@ -7,7 +7,7 @@ import { Password } from '../domain/user/value-object/password'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { Email } from '../domain/user/value-object/email'
 
-export class UsersRepository {
+export class UserRepository {
   constructor(
     @InjectRepository(UserModel)
     private readonly repository: Repository<UserModel>,

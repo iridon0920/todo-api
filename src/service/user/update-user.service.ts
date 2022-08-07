@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { UsersRepository } from '../../repository/users.repository'
+import { UserRepository } from '../../repository/user.repository'
 import { UpdateUserParam } from '../../dto/request/user/update-user-param'
 
 @Injectable()
 export class UpdateUserService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UserRepository) {}
 
   async execute(userId: number, param: UpdateUserParam) {
     const user = await this.usersRepository.findById(userId)
