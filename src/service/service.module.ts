@@ -6,6 +6,7 @@ import { DeleteUserService } from './user/delete-user.service'
 import { CreateTodoService } from './todo/create-todo.service'
 import { UpdateTodoService } from './todo/update-todo.service'
 import { GetTodoService } from './todo/get-todo.service'
+import { DeleteTodoService } from './todo/delete-todo.service'
 
 @Module({
   imports: [RepositoryModule],
@@ -16,6 +17,7 @@ import { GetTodoService } from './todo/get-todo.service'
     CreateTodoService,
     UpdateTodoService,
     GetTodoService,
+    DeleteTodoService,
   ],
   exports: [
     CreateUserService,
@@ -24,6 +26,7 @@ import { GetTodoService } from './todo/get-todo.service'
     CreateTodoService,
     UpdateTodoService,
     GetTodoService,
+    DeleteTodoService,
   ],
 })
 export class ServiceModule {}

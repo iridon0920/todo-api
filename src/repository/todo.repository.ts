@@ -35,6 +35,10 @@ export class TodoRepository {
     await this.repository.save(todoModel)
   }
 
+  async delete(todoId: number) {
+    await this.repository.delete(todoId)
+  }
+
   count() {
     return this.repository.count()
   }

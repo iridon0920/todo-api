@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -18,6 +19,7 @@ import { convertToTodoResponse } from '../domain/todo/function/convert-to-todo-r
 import { UpdateTodoParam } from '../dto/request/todo/update-todo-param'
 import { UpdateTodoService } from '../service/todo/update-todo.service'
 import { GetTodoService } from '../service/todo/get-todo.service'
+import { DeleteTodoService } from '../service/todo/delete-todo.service'
 
 @Controller('todos')
 export class TodosController {
@@ -25,6 +27,7 @@ export class TodosController {
     private readonly createTodoService: CreateTodoService,
     private readonly updateTodoService: UpdateTodoService,
     private readonly getTodoService: GetTodoService,
+    private readonly deleteTodoService: DeleteTodoService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -60,5 +63,14 @@ export class TodosController {
   async get(@Param('id', ParseIntPipe) id: number): Promise<TodoResponse> {
     const todo = await this.getTodoService.execute(id)
     return convertToTodoResponse(todo)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(
+    @Request() request: AuthUserParam,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    await this.deleteTodoService.execute(id, request.user.userId)
   }
 }

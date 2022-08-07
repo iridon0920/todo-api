@@ -108,4 +108,42 @@ describe('TodosController (e2e)', () => {
   it('Todoの参照失敗（認証なしでは取得不可） - /todos/:id (Get)', () => {
     return request(app.getHttpServer()).get('/todos/1').expect(401)
   })
+
+  it('Todoの削除 - /todos/:id (Delete)', async () => {
+    await request(app.getHttpServer())
+      .delete('/todos/1')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(200)
+      .expect({})
+
+    // 削除したTodoを参照しようとしても失敗する
+    return request(app.getHttpServer())
+      .get('/todos/1')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(404)
+  })
+
+  it('Todoの削除失敗（他のユーザのTodoは削除できない） - /todos/:id (Delete)', async () => {
+    // ユーザ1でタスク作成
+    await request(app.getHttpServer())
+      .post('/todos')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        title: '水を買う',
+        content: 'ドラッグストアで買うこと。',
+      })
+      .expect(201)
+      .expect({
+        id: 2,
+        title: '水を買う',
+        content: 'ドラッグストアで買うこと。',
+        userId: 1,
+      })
+
+    // ユーザ2で削除しようとしても失敗
+    await request(app.getHttpServer())
+      .delete('/todos/2')
+      .set('Authorization', `Bearer ${jwtToken2}`)
+      .expect(401)
+  })
 })
