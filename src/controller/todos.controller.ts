@@ -19,6 +19,8 @@ import { UpdateTodoParam } from '../dto/request/todo/update-todo-param'
 import { UpdateTodoService } from '../service/todo/update-todo.service'
 import { GetTodoService } from '../service/todo/get-todo.service'
 import { DeleteTodoService } from '../service/todo/delete-todo.service'
+import { SearchTodoParam } from '../dto/request/todo/search-todo-param'
+import { SearchTodoService } from '../service/todo/search-todo.service'
 
 @Controller('todos')
 export class TodosController {
@@ -27,6 +29,7 @@ export class TodosController {
     private readonly updateTodoService: UpdateTodoService,
     private readonly getTodoService: GetTodoService,
     private readonly deleteTodoService: DeleteTodoService,
+    private readonly searchTodoService: SearchTodoService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -68,5 +71,12 @@ export class TodosController {
   @Delete(':id')
   async delete(@Request() request: AuthUserParam, @Param('id') id: string) {
     await this.deleteTodoService.execute(id, request.user.userId)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async search(@Body() param: SearchTodoParam) {
+    const todos = await this.searchTodoService.execute(param)
+    return todos.map((todo) => convertToTodoResponse(todo))
   }
 }

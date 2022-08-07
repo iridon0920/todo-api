@@ -11,6 +11,8 @@ describe('TodosController (e2e)', () => {
   let jwtToken: string
   // 2つ目のユーザのトークン
   let jwtToken2: string
+
+  let user2Id: string
   let todo1Id: string
 
   beforeAll(async () => {
@@ -59,11 +61,13 @@ describe('TodosController (e2e)', () => {
 
   it('Todoの更新失敗（他のユーザのTodoは更新できない） - /todos/:id (PATCH)', async () => {
     // 新規ユーザ作成
-    await request(app.getHttpServer()).post('/user').send({
+    const userResponse = await request(app.getHttpServer()).post('/user').send({
       email: 'test2@example.com',
       name: 'テスト2',
       password: 'password',
     })
+    user2Id = userResponse.body.id
+
     // 新規ユーザのログイントークン取得
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
@@ -132,7 +136,7 @@ describe('TodosController (e2e)', () => {
 
   it('Todoの削除失敗（他のユーザのTodoは削除できない） - /todos/:id (Delete)', async () => {
     // ユーザ1でタスク作成
-    const todoResponst = await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/todos')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
@@ -142,10 +146,78 @@ describe('TodosController (e2e)', () => {
       .expect(201)
 
     // ユーザ2で削除しようとしても失敗
-    const todoId = todoResponst.body.id
+    const todoId = response.body.id
     await request(app.getHttpServer())
       .delete(`/todos/${todoId}`)
       .set('Authorization', `Bearer ${jwtToken2}`)
       .expect(401)
+  })
+
+  it('Todo検索(タイトル検索) - /todos (Get)', async () => {
+    // ユーザ2でタスクを2つ作成
+    await request(app.getHttpServer())
+      .post('/todos')
+      .set('Authorization', `Bearer ${jwtToken2}`)
+      .send({
+        title: '水道代を払う',
+        content: 'コンビニで支払うこと。',
+      })
+      .expect(201)
+    await request(app.getHttpServer())
+      .post('/todos')
+      .set('Authorization', `Bearer ${jwtToken2}`)
+      .send({
+        title: 'ガス代を払う',
+        content: 'コンビニで支払うこと。',
+      })
+      .expect(201)
+
+    const response = await request(app.getHttpServer())
+      .get('/todos')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        title: '水',
+      })
+      .expect(200)
+
+    expect(response.body).toEqual([
+      {
+        id: expect.any(String),
+        title: '水を買う',
+        content: 'ドラッグストアで買うこと。',
+        userId: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        title: '水道代を払う',
+        content: 'コンビニで支払うこと。',
+        userId: expect.any(String),
+      },
+    ])
+  })
+
+  it('Todo検索(UserId検索) - /todos (Get)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/todos')
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .send({
+        userId: user2Id,
+      })
+      .expect(200)
+
+    expect(response.body).toEqual([
+      {
+        id: expect.any(String),
+        title: '水道代を払う',
+        content: 'コンビニで支払うこと。',
+        userId: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        title: 'ガス代を払う',
+        content: 'コンビニで支払うこと。',
+        userId: expect.any(String),
+      },
+    ])
   })
 })
