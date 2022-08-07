@@ -14,8 +14,8 @@ describe('UserController (e2e)', () => {
     app = await getInitApp(moduleFixture)
   })
 
-  it('新規ユーザ作成 - /user (POST)', () => {
-    return request(app.getHttpServer())
+  it('新規ユーザ作成 - /user (POST)', async () => {
+    const response = await request(app.getHttpServer())
       .post('/user')
       .send({
         email: 'test@example.com',
@@ -23,7 +23,12 @@ describe('UserController (e2e)', () => {
         password: 'password',
       })
       .expect(201)
-      .expect({ id: 1, email: 'test@example.com', name: 'テスト' })
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      email: 'test@example.com',
+      name: 'テスト',
+    })
   })
 
   it('ユーザ作成失敗（メール重複） - /user (POST)', () => {
@@ -63,14 +68,19 @@ describe('UserController (e2e)', () => {
       })
     jwtToken = loginResponse.body.access_token
 
-    return request(app.getHttpServer())
+    const todoResponse = await request(app.getHttpServer())
       .patch('/user')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
         name: 'test',
       })
       .expect(200)
-      .expect({ id: 1, email: 'test@example.com', name: 'test' })
+
+    expect(todoResponse.body).toEqual({
+      id: expect.any(String),
+      email: 'test@example.com',
+      name: 'test',
+    })
   })
 
   it('認証ユーザを削除 - /user (DELETE)', async () => {

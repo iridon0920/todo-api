@@ -4,6 +4,7 @@ import { CreateUserParam } from '../../dto/request/user/create-user-param'
 import { User } from '../../domain/user/user'
 import { Email } from '../../domain/user/value-object/email'
 import { Password } from '../../domain/user/value-object/password'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class CreateUserService {
@@ -17,11 +18,7 @@ export class CreateUserService {
       )
     }
 
-    const user = new User(
-      await this.getNewUserId(),
-      new Email(param.email),
-      param.name,
-    )
+    const user = new User(uuidv4(), new Email(param.email), param.name)
     const password = new Password(param.password)
 
     await this.usersRepository.save(user, password)
@@ -32,10 +29,5 @@ export class CreateUserService {
   private async existsEmail(email: string) {
     const results = await this.usersRepository.findEmail(email)
     return results.length > 0
-  }
-
-  private async getNewUserId() {
-    const usersCount = await this.usersRepository.count()
-    return usersCount + 1
   }
 }

@@ -6,7 +6,7 @@ import { UpdateUserParam } from '../../dto/request/user/update-user-param'
 export class UpdateUserService {
   constructor(private readonly usersRepository: UserRepository) {}
 
-  async execute(userId: number, param: UpdateUserParam) {
+  async execute(userId: string, param: UpdateUserParam) {
     const user = await this.usersRepository.findById(userId)
 
     if (param.name) {

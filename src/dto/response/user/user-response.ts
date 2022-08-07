@@ -2,7 +2,7 @@
  * ユーザ作成、更新エンドポイントのレスポンスデータ構造
  */
 export interface UserResponse {
-  id: number
+  id: string
   email: string
   name: string
 }

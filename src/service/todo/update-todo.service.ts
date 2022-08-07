@@ -6,7 +6,7 @@ import { UpdateTodoParam } from '../../dto/request/todo/update-todo-param'
 export class UpdateTodoService {
   constructor(private readonly todoRepository: TodoRepository) {}
 
-  async execute(todoId: number, param: UpdateTodoParam, userId: number) {
+  async execute(todoId: string, param: UpdateTodoParam, userId: string) {
     const todo = await this.todoRepository.findById(todoId)
 
     if (todo.getUserId() !== userId) {

@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Request,
@@ -47,7 +46,7 @@ export class TodosController {
   @Patch(':id')
   async update(
     @Request() request: AuthUserParam,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() param: UpdateTodoParam,
   ): Promise<TodoResponse> {
     const todo = await this.updateTodoService.execute(
@@ -60,17 +59,14 @@ export class TodosController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async get(@Param('id', ParseIntPipe) id: number): Promise<TodoResponse> {
+  async get(@Param('id') id: string): Promise<TodoResponse> {
     const todo = await this.getTodoService.execute(id)
     return convertToTodoResponse(todo)
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(
-    @Request() request: AuthUserParam,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async delete(@Request() request: AuthUserParam, @Param('id') id: string) {
     await this.deleteTodoService.execute(id, request.user.userId)
   }
 }

@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * このメソッドの戻り値はControllerの@Request()デコレータが付いたパラメータオブジェクトのuserプロパティに入る
    */
   async validate(payload: {
-    userId: number
+    userId: string
     email: string
   }): Promise<JwtAuthResult> {
     return { userId: payload.userId, email: payload.email }

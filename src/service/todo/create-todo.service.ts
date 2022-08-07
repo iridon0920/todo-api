@@ -3,6 +3,7 @@ import { TodoRepository } from '../../repository/todo.repository'
 import { CreateTodoParam } from '../../dto/request/todo/create-todo-param'
 import { Todo } from '../../domain/todo/todo'
 import { UserRepository } from '../../repository/user.repository'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class CreateTodoService {
@@ -11,21 +12,11 @@ export class CreateTodoService {
     private readonly todoRepository: TodoRepository,
   ) {}
 
-  async execute(userId: number, param: CreateTodoParam) {
-    const todo = new Todo(
-      await this.getNewTodoId(),
-      param.title,
-      param.content,
-      userId,
-    )
+  async execute(userId: string, param: CreateTodoParam) {
+    const todo = new Todo(uuidv4(), param.title, param.content, userId)
 
     await this.todoRepository.save(todo)
 
     return todo
-  }
-
-  private async getNewTodoId() {
-    const todosCount = await this.todoRepository.count()
-    return todosCount + 1
   }
 }

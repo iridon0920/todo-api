@@ -1,4 +1,4 @@
 export interface JwtAuthResult {
-  userId: number
+  userId: string
   email: string
 }

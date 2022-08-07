@@ -13,7 +13,7 @@ export class UserRepository {
     private readonly repository: Repository<UserModel>,
   ) {}
 
-  async findById(userId: number) {
+  async findById(userId: string) {
     const userModel = await this.repository.findOne({ where: { id: userId } })
 
     if (userModel === null) {
@@ -33,12 +33,8 @@ export class UserRepository {
     await this.repository.save(userModel)
   }
 
-  async delete(userId: number) {
+  async delete(userId: string) {
     await this.repository.delete(userId)
-  }
-
-  count() {
-    return this.repository.count()
   }
 
   findEmail(email: string) {

@@ -11,11 +11,11 @@ const USER_NAME_LENGTH_LIMIT = 30
  * ユーザエンティティクラス
  */
 export class User {
-  private readonly id: number
+  private readonly id: string
   private readonly email: Email
   private name: string
 
-  constructor(id: number, email: Email, name: string) {
+  constructor(id: string, email: Email, name: string) {
     this.validateValues(name)
 
     this.id = id

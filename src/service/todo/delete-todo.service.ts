@@ -5,7 +5,7 @@ import { TodoRepository } from '../../repository/todo.repository'
 export class DeleteTodoService {
   constructor(private readonly todoRepository: TodoRepository) {}
 
-  async execute(todoId: number, userId: number) {
+  async execute(todoId: string, userId: string) {
     const todo = await this.todoRepository.findById(todoId)
     if (todo.getUserId() !== userId) {
       throw new HttpException(

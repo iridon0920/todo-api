@@ -14,12 +14,12 @@ const TODO_CONTENT_LENGTH_LIMIT = 15000
  * Todoエンティティクラス
  */
 export class Todo {
-  private readonly id: number
+  private readonly id: string
   private title: string
   private content: string
-  private readonly userId: number
+  private readonly userId: string
 
-  constructor(id: number, title: string, content: string, userId: number) {
+  constructor(id: string, title: string, content: string, userId: string) {
     this.validateValue(title, content)
 
     this.id = id

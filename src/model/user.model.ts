@@ -2,17 +2,19 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { TodoModel } from './todo.model'
 
 @Entity('user')
 export class UserModel {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryColumn()
+  id: string
 
+  @Index({ unique: true })
   @Column()
   email: string
 

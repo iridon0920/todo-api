@@ -5,7 +5,7 @@ import { TodoRepository } from '../../repository/todo.repository'
 export class GetTodoService {
   constructor(private readonly todoRepository: TodoRepository) {}
 
-  async execute(todoId: number) {
+  async execute(todoId: string) {
     return await this.todoRepository.findById(todoId)
   }
 }

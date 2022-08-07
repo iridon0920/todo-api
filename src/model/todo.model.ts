@@ -1,10 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 import { UserModel } from './user.model'
 
 @Entity('todo')
 export class TodoModel {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryColumn()
+  id: string
 
   @Column()
   title: string
@@ -13,7 +20,13 @@ export class TodoModel {
   content: string
 
   @Column()
-  userId: number
+  userId: string
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
 
   @ManyToOne(() => UserModel, (user) => user.todos)
   user: UserModel

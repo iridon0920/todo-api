@@ -11,7 +11,7 @@ export class TodoRepository {
     private readonly repository: Repository<TodoModel>,
   ) {}
 
-  async findById(todoId: number) {
+  async findById(todoId: string) {
     const todoModel = await this.repository.findOne({
       where: { id: todoId },
       relations: ['user'],
@@ -35,11 +35,7 @@ export class TodoRepository {
     await this.repository.save(todoModel)
   }
 
-  async delete(todoId: number) {
+  async delete(todoId: string) {
     await this.repository.delete(todoId)
-  }
-
-  count() {
-    return this.repository.count()
   }
 }

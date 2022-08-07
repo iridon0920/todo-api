@@ -11,6 +11,7 @@ describe('TodosController (e2e)', () => {
   let jwtToken: string
   // 2つ目のユーザのトークン
   let jwtToken2: string
+  let todo1Id: string
 
   beforeAll(async () => {
     moduleFixture = await getTestModule()
@@ -18,8 +19,8 @@ describe('TodosController (e2e)', () => {
     jwtToken = await getTestUserToken(app)
   })
 
-  it('Todo作成 - /todos (POST)', () => {
-    return request(app.getHttpServer())
+  it('Todo作成 - /todos (POST)', async () => {
+    const response = await request(app.getHttpServer())
       .post('/todos')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
@@ -27,29 +28,33 @@ describe('TodosController (e2e)', () => {
         content: '近所のスーパーで買うこと。',
       })
       .expect(201)
-      .expect({
-        id: 1,
-        title: 'ミルクを買う',
-        content: '近所のスーパーで買うこと。',
-        userId: 1,
-      })
+
+    todo1Id = response.body.id
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      title: 'ミルクを買う',
+      content: '近所のスーパーで買うこと。',
+      userId: expect.any(String),
+    })
   })
 
-  it('Todoの更新 - /todos/:id (PATCH)', () => {
+  it('Todoの更新 - /todos/:id (PATCH)', async () => {
     // POSTのテストで作成したTodoを更新
-    return request(app.getHttpServer())
-      .patch('/todos/1')
+    const response = await request(app.getHttpServer())
+      .patch(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
         title: '卵を買う',
       })
       .expect(200)
-      .expect({
-        id: 1,
-        title: '卵を買う',
-        content: '近所のスーパーで買うこと。',
-        userId: 1,
-      })
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      title: '卵を買う',
+      content: '近所のスーパーで買うこと。',
+      userId: expect.any(String),
+    })
   })
 
   it('Todoの更新失敗（他のユーザのTodoは更新できない） - /todos/:id (PATCH)', async () => {
@@ -70,7 +75,7 @@ describe('TodosController (e2e)', () => {
 
     // 新規ユーザで作成済Todoの更新リクエスト
     return request(app.getHttpServer())
-      .patch('/todos/1')
+      .patch(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken2}`)
       .send({
         title: '豚肉を買う',
@@ -78,54 +83,56 @@ describe('TodosController (e2e)', () => {
       .expect(401)
   })
 
-  it('Todoの参照 - /todos/:id (Get)', () => {
+  it('Todoの参照 - /todos/:id (Get)', async () => {
     // PATCHのテストで更新したTodoを取得
-    return request(app.getHttpServer())
-      .get('/todos/1')
+    const response = await request(app.getHttpServer())
+      .get(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(200)
-      .expect({
-        id: 1,
-        title: '卵を買う',
-        content: '近所のスーパーで買うこと。',
-        userId: 1,
-      })
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      title: '卵を買う',
+      content: '近所のスーパーで買うこと。',
+      userId: expect.any(String),
+    })
   })
 
-  it('Todoの参照（別ユーザでも参照可能） - /todos/:id (Get)', () => {
-    return request(app.getHttpServer())
-      .get('/todos/1')
+  it('Todoの参照（別ユーザでも参照可能） - /todos/:id (Get)', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken2}`)
       .expect(200)
-      .expect({
-        id: 1,
-        title: '卵を買う',
-        content: '近所のスーパーで買うこと。',
-        userId: 1,
-      })
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      title: '卵を買う',
+      content: '近所のスーパーで買うこと。',
+      userId: expect.any(String),
+    })
   })
 
   it('Todoの参照失敗（認証なしでは取得不可） - /todos/:id (Get)', () => {
-    return request(app.getHttpServer()).get('/todos/1').expect(401)
+    return request(app.getHttpServer()).get(`/todos/${todo1Id}`).expect(401)
   })
 
   it('Todoの削除 - /todos/:id (Delete)', async () => {
     await request(app.getHttpServer())
-      .delete('/todos/1')
+      .delete(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(200)
       .expect({})
 
     // 削除したTodoを参照しようとしても失敗する
     return request(app.getHttpServer())
-      .get('/todos/1')
+      .get(`/todos/${todo1Id}`)
       .set('Authorization', `Bearer ${jwtToken}`)
       .expect(404)
   })
 
   it('Todoの削除失敗（他のユーザのTodoは削除できない） - /todos/:id (Delete)', async () => {
     // ユーザ1でタスク作成
-    await request(app.getHttpServer())
+    const todoResponst = await request(app.getHttpServer())
       .post('/todos')
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
@@ -133,16 +140,11 @@ describe('TodosController (e2e)', () => {
         content: 'ドラッグストアで買うこと。',
       })
       .expect(201)
-      .expect({
-        id: 2,
-        title: '水を買う',
-        content: 'ドラッグストアで買うこと。',
-        userId: 1,
-      })
 
     // ユーザ2で削除しようとしても失敗
+    const todoId = todoResponst.body.id
     await request(app.getHttpServer())
-      .delete('/todos/2')
+      .delete(`/todos/${todoId}`)
       .set('Authorization', `Bearer ${jwtToken2}`)
       .expect(401)
   })
