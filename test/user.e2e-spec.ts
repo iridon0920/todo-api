@@ -1,10 +1,8 @@
 import * as request from 'supertest'
-import { Test, TestingModule } from '@nestjs/testing'
+import { TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { ControllerModule } from '../src/controller/controller.module'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { UserModel } from '../src/model/user.model'
-import { TodoModel } from '../src/model/todo.model'
+import { getTestModule } from './function/get-test-module'
+import { getInitApp } from './function/get-init-app'
 
 describe('UserController (e2e)', () => {
   let app: INestApplication
@@ -12,21 +10,8 @@ describe('UserController (e2e)', () => {
   let jwtToken: string
 
   beforeAll(async () => {
-    moduleFixture = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [UserModel, TodoModel],
-          synchronize: true,
-        }),
-        ControllerModule,
-      ],
-    }).compile()
-
-    // Nestアプリケーション起動
-    app = moduleFixture.createNestApplication()
-    await app.init()
+    moduleFixture = await getTestModule()
+    app = await getInitApp(moduleFixture)
   })
 
   it('新規ユーザ作成 - /user (POST)', () => {

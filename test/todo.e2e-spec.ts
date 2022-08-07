@@ -1,11 +1,9 @@
 import { INestApplication } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { UserModel } from '../src/model/user.model'
-import { TodoModel } from '../src/model/todo.model'
-import { ControllerModule } from '../src/controller/controller.module'
+import { TestingModule } from '@nestjs/testing'
 import * as request from 'supertest'
-import { getTestUserToken } from './get-test-user-token'
+import { getTestUserToken } from './function/get-test-user-token'
+import { getTestModule } from './function/get-test-module'
+import { getInitApp } from './function/get-init-app'
 
 describe('TodosController (e2e)', () => {
   let app: INestApplication
@@ -13,22 +11,8 @@ describe('TodosController (e2e)', () => {
   let jwtToken: string
 
   beforeAll(async () => {
-    moduleFixture = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [UserModel, TodoModel],
-          synchronize: true,
-        }),
-        ControllerModule,
-      ],
-    }).compile()
-
-    // Nestアプリケーション起動
-    app = moduleFixture.createNestApplication()
-    await app.init()
-
+    moduleFixture = await getTestModule()
+    app = await getInitApp(moduleFixture)
     jwtToken = await getTestUserToken(app)
   })
 
