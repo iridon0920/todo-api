@@ -10,6 +10,12 @@ describe('ユーザエンティティ', () => {
     expect(user.getName()).toBe('田中　太郎')
   })
 
+  it('名前に空文字をセットしようとすると例外', () => {
+    expect(() => new User(1, new Email('test@example.com'), '')).toThrow(
+      'ユーザ名の長さは1文字以上にしてください。',
+    )
+  })
+
   it('名前に長さが31文字以上の文字列をセットしようとすると例外', () => {
     const str = 'a'.repeat(31)
     expect(() => new User(1, new Email('test@example.com'), str)).toThrow(
