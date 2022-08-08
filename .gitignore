@@ -255,3 +255,13 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/node,webstorm
+
+*.js
+!jest.config.js
+!.eslintrc.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
