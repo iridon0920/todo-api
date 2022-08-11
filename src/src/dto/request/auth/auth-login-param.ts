@@ -1,4 +1,4 @@
 export interface AuthLoginParam {
-  email: string
+  userId: string
   password: string
 }

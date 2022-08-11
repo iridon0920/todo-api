@@ -4,6 +4,7 @@ import * as request from 'supertest'
 import { getTestUserToken } from './function/get-test-user-token'
 import { getTestModule } from './function/get-test-module'
 import { getInitApp } from './function/get-init-app'
+import { createDynamoLocalTable } from '../src/repository/function/create-dynamo-local-table'
 
 describe('TodosController (e2e)', () => {
   let app: INestApplication
@@ -18,6 +19,7 @@ describe('TodosController (e2e)', () => {
   beforeAll(async () => {
     moduleFixture = await getTestModule()
     app = await getInitApp(moduleFixture)
+    await createDynamoLocalTable()
     jwtToken = await getTestUserToken(app)
   })
 
@@ -72,7 +74,7 @@ describe('TodosController (e2e)', () => {
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'test2@example.com',
+        userId: user2Id,
         password: 'password',
       })
     jwtToken2 = loginResponse.body.access_token
@@ -180,20 +182,23 @@ describe('TodosController (e2e)', () => {
       })
       .expect(200)
 
-    expect(response.body).toEqual([
-      {
-        id: expect.any(String),
-        title: '水を買う',
-        content: 'ドラッグストアで買うこと。',
-        userId: expect.any(String),
-      },
-      {
-        id: expect.any(String),
-        title: '水道代を払う',
-        content: 'コンビニで支払うこと。',
-        userId: expect.any(String),
-      },
-    ])
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        {
+          id: expect.any(String),
+          title: '水を買う',
+          content: 'ドラッグストアで買うこと。',
+          userId: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          title: '水道代を払う',
+          content: 'コンビニで支払うこと。',
+          userId: expect.any(String),
+        },
+      ]),
+    )
+    expect(response.body.length).toEqual(2)
   })
 
   it('Todo検索(UserId検索) - /todos (Get)', async () => {
@@ -205,19 +210,22 @@ describe('TodosController (e2e)', () => {
       })
       .expect(200)
 
-    expect(response.body).toEqual([
-      {
-        id: expect.any(String),
-        title: '水道代を払う',
-        content: 'コンビニで支払うこと。',
-        userId: expect.any(String),
-      },
-      {
-        id: expect.any(String),
-        title: 'ガス代を払う',
-        content: 'コンビニで支払うこと。',
-        userId: expect.any(String),
-      },
-    ])
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        {
+          id: expect.any(String),
+          title: 'ガス代を払う',
+          content: 'コンビニで支払うこと。',
+          userId: expect.any(String),
+        },
+        {
+          id: expect.any(String),
+          title: '水道代を払う',
+          content: 'コンビニで支払うこと。',
+          userId: expect.any(String),
+        },
+      ]),
+    )
+    expect(response.body.length).toEqual(2)
   })
 })

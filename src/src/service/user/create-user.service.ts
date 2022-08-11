@@ -21,13 +21,13 @@ export class CreateUserService {
     const user = new User(uuidv4(), new Email(param.email), param.name)
     const password = new Password(param.password)
 
-    await this.usersRepository.save(user, password)
+    await this.usersRepository.create(user, password)
 
     return user
   }
 
   private async existsEmail(email: string) {
-    const results = await this.usersRepository.findEmail(email)
-    return results.length > 0
+    const count = await this.usersRepository.findEmailCount(email)
+    return count > 0
   }
 }

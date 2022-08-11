@@ -26,6 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     userId: string
     email: string
   }): Promise<JwtAuthResult> {
-    return { userId: payload.userId, email: payload.email }
+    return { userId: payload.userId }
   }
 }

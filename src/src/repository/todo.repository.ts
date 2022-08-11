@@ -1,48 +1,61 @@
-import { InjectRepository } from '@nestjs/typeorm'
-import { TodoModel } from '../model/todo.model'
-import { Repository } from 'typeorm'
 import { Todo } from '../domain/todo/todo'
-import { convertToTodoModel } from '../domain/todo/function/convert-to-todo-model'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { SearchTodoParam } from '../dto/request/todo/search-todo-param'
+import {
+  DeleteCommand,
+  GetCommand,
+  PutCommand,
+  ScanCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb'
+import { documentClient } from './function/db-client'
+import { TODOS_TABLE_NAME } from './function/create-dynamo-local-table'
+import { TodoModel } from './model/todo.model'
 
 export class TodoRepository {
-  constructor(
-    @InjectRepository(TodoModel)
-    private readonly repository: Repository<TodoModel>,
-  ) {}
-
   async findByParam(param: SearchTodoParam) {
-    let query = this.repository.createQueryBuilder()
-
-    if (param.userId) {
-      query = query.where('userId = :userId', { userId: param.userId })
-    }
-    if (param.title) {
-      query = query.where('title like :title', { title: `%${param.title}%` })
-    }
-
-    const todoModels = await query.getMany()
-    return todoModels.map((todoModel) => {
-      return new Todo(
-        todoModel.id,
-        todoModel.title,
-        todoModel.content,
-        todoModel.userId,
-      )
+    const command = new ScanCommand({
+      TableName: TODOS_TABLE_NAME,
     })
+    const output = await documentClient.send(command)
+    const todoModels = output.Items as TodoModel[]
+
+    return todoModels
+      .filter((todo) => {
+        if (param.userId) {
+          return todo.userId === param.userId
+        }
+        return true
+      })
+      .filter((todo) => {
+        if (param.title) {
+          return todo.title.includes(param.title)
+        }
+        return true
+      })
+      .map((todoModel) => {
+        return new Todo(
+          todoModel.id,
+          todoModel.title,
+          todoModel.content,
+          todoModel.userId,
+        )
+      })
   }
 
   async findById(todoId: string) {
-    const todoModel = await this.repository.findOne({
-      where: { id: todoId },
-      relations: ['user'],
+    const command = new GetCommand({
+      TableName: TODOS_TABLE_NAME,
+      Key: {
+        id: todoId,
+      },
     })
-
-    if (todoModel === null) {
+    const output = await documentClient.send(command)
+    if (output.Item === undefined) {
       throw new HttpException('Todoが見つかりません。', HttpStatus.NOT_FOUND)
     }
 
+    const todoModel = output.Item as TodoModel
     return new Todo(
       todoModel.id,
       todoModel.title,
@@ -51,13 +64,44 @@ export class TodoRepository {
     )
   }
 
-  async save(todo: Todo) {
-    const todoModel = convertToTodoModel(todo)
+  async create(todo: Todo) {
+    const command = new PutCommand({
+      TableName: TODOS_TABLE_NAME,
+      Item: {
+        id: todo.getId(),
+        title: todo.getTitle(),
+        content: todo.getContent(),
+        userId: todo.getUserId(),
+      },
+    })
 
-    await this.repository.save(todoModel)
+    await documentClient.send(command)
+  }
+
+  async update(todo: Todo) {
+    const command = new UpdateCommand({
+      TableName: TODOS_TABLE_NAME,
+      Key: {
+        id: todo.getId(),
+      },
+      UpdateExpression: 'Set title = :title, content = :content',
+      ExpressionAttributeValues: {
+        ':title': todo.getTitle(),
+        ':content': todo.getContent(),
+      },
+    })
+
+    await documentClient.send(command)
   }
 
   async delete(todoId: string) {
-    await this.repository.delete(todoId)
+    const command = new DeleteCommand({
+      TableName: TODOS_TABLE_NAME,
+      Key: {
+        id: todoId,
+      },
+    })
+
+    await documentClient.send(command)
   }
 }

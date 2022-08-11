@@ -13,7 +13,7 @@ export class UpdateUserService {
       user.changeName(param.name)
     }
 
-    await this.usersRepository.save(user)
+    await this.usersRepository.update(user)
 
     return user
   }

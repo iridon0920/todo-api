@@ -15,7 +15,7 @@ export class CreateTodoService {
   async execute(userId: string, param: CreateTodoParam) {
     const todo = new Todo(uuidv4(), param.title, param.content, userId)
 
-    await this.todoRepository.save(todo)
+    await this.todoRepository.create(todo)
 
     return todo
   }

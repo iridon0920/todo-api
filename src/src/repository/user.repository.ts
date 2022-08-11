@@ -1,43 +1,100 @@
-import { InjectRepository } from '@nestjs/typeorm'
-import { UserModel } from '../model/user.model'
-import { Repository } from 'typeorm'
 import { User } from '../domain/user/user'
-import { convertToUserModel } from '../domain/user/function/convert-to-user-model'
 import { Password } from '../domain/user/value-object/password'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { Email } from '../domain/user/value-object/email'
+import {
+  DeleteCommand,
+  GetCommand,
+  PutCommand,
+  ScanCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb'
+import { documentClient } from './function/db-client'
+import { USERS_TABLE_NAME } from './function/create-dynamo-local-table'
+import { UserModel } from './model/user.model'
 
 export class UserRepository {
-  constructor(
-    @InjectRepository(UserModel)
-    private readonly repository: Repository<UserModel>,
-  ) {}
-
   async findById(userId: string) {
-    const userModel = await this.repository.findOne({ where: { id: userId } })
+    const command = new GetCommand({
+      TableName: USERS_TABLE_NAME,
+      Key: {
+        id: userId,
+      },
+    })
+    const output = await documentClient.send(command)
 
-    if (userModel === null) {
+    if (output.Item === undefined) {
       throw new HttpException('ユーザが見つかりません。', HttpStatus.NOT_FOUND)
     }
 
+    const userModel = output.Item as UserModel
     return new User(userModel.id, new Email(userModel.email), userModel.name)
   }
 
-  async save(user: User, password?: Password) {
-    const userModel = convertToUserModel(user)
+  async findHashPasswordById(userId: string): Promise<string | undefined> {
+    const command = new GetCommand({
+      TableName: USERS_TABLE_NAME,
+      Key: {
+        id: userId,
+      },
+    })
+    const output = await documentClient.send(command)
+    return output.Item ? output.Item.password : undefined
+  }
 
-    if (password) {
-      userModel.password = await password.getHash()
-    }
+  async create(user: User, password: Password) {
+    const command = new PutCommand({
+      TableName: USERS_TABLE_NAME,
+      Item: {
+        id: user.getId(),
+        email: user.getEmail().toString(),
+        name: user.getName(),
+        password: await password.getHash(),
+      },
+    })
 
-    await this.repository.save(userModel)
+    await documentClient.send(command)
+  }
+
+  async update(user: User) {
+    const command = new UpdateCommand({
+      TableName: USERS_TABLE_NAME,
+      Key: {
+        id: user.getId(),
+      },
+      UpdateExpression: 'set #n = :userName',
+      ExpressionAttributeNames: {
+        '#n': 'name',
+      },
+      ExpressionAttributeValues: {
+        ':userName': user.getName(),
+      },
+    })
+
+    await documentClient.send(command)
   }
 
   async delete(userId: string) {
-    await this.repository.delete(userId)
+    const command = new DeleteCommand({
+      TableName: USERS_TABLE_NAME,
+      Key: {
+        id: userId,
+      },
+    })
+
+    await documentClient.send(command)
   }
 
-  findEmail(email: string) {
-    return this.repository.find({ where: { email } })
+  async findEmailCount(email: string) {
+    const command = new ScanCommand({
+      TableName: USERS_TABLE_NAME,
+      FilterExpression: 'email = :email',
+      ExpressionAttributeValues: {
+        ':email': email,
+      },
+    })
+
+    const result = await documentClient.send(command)
+    return result.Count
   }
 }

@@ -3,15 +3,18 @@ import { TestingModule } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
 import { getTestModule } from './function/get-test-module'
 import { getInitApp } from './function/get-init-app'
+import { createDynamoLocalTable } from '../src/repository/function/create-dynamo-local-table'
 
 describe('UserController (e2e)', () => {
   let app: INestApplication
   let moduleFixture: TestingModule
+  let userId: string
   let jwtToken: string
 
   beforeAll(async () => {
     moduleFixture = await getTestModule()
     app = await getInitApp(moduleFixture)
+    await createDynamoLocalTable()
   })
 
   it('新規ユーザ作成 - /user (POST)', async () => {
@@ -24,6 +27,7 @@ describe('UserController (e2e)', () => {
       })
       .expect(201)
 
+    userId = response.body.id
     expect(response.body).toEqual({
       id: expect.any(String),
       email: 'test@example.com',
@@ -63,7 +67,7 @@ describe('UserController (e2e)', () => {
     const loginResponse = await request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'test@example.com',
+        userId,
         password: 'password',
       })
     jwtToken = loginResponse.body.access_token
@@ -95,7 +99,7 @@ describe('UserController (e2e)', () => {
     return request(app.getHttpServer())
       .post('/auth/login')
       .send({
-        email: 'test@example.com',
+        userId,
         password: 'password',
       })
       .expect(401)
