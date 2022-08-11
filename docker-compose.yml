@@ -1,26 +1,27 @@
 version: '3.8'
 services:
   node:
-    build:
-      context: .
+    image: node:18.7-bullseye
+    working_dir: /app
     volumes:
       - ./src:/app
     tty: true
     ports:
       - "3000:3000"
+    command: 'npm run start:dev'
     environment:
-      DB_HOST: $DB_HOST
-      DB_NAME: $DB_NAME
-      DB_ROOT_PASS: $DB_ROOT_PASS
-      DB_USER: $DB_USER
-      DB_PASS: $DB_PASS
       JWT_SECRET: $JWT_SECRET
+      DYNAMODB_ENDPOINT: $DYNAMODB_ENDPOINT
+      DYNAMODB_REGION: $DYNAMODB_REGION
+      DYNAMODB_ACCESS_KEY_ID: $DYNAMODB_ACCESS_KEY_ID
+      DYNAMODB_SECRET_ACCESS_KEY: $DYNAMODB_SECRET_ACCESS_KEY
+      LOCAL_RUNNING: $LOCAL_RUNNING
+    depends_on:
+      - dynamodb-local
 
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: $DB_NAME
-      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASS
-      MYSQL_USER: $DB_USER
-      MYSQL_PASSWORD: $DB_PASS
-      TZ: 'Asia/Tokyo'
+  dynamodb-local:
+    image: amazon/dynamodb-local:1.19.0
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    working_dir: /home/dynamodblocal
