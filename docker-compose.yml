@@ -1,14 +1,14 @@
 version: '3.8'
 services:
   node:
-    image: node:18.7-bullseye
+    build:
+      context: .
     working_dir: /app
     volumes:
       - ./src:/app
     tty: true
     ports:
       - "3000:3000"
-    command: 'npm run start:dev'
     environment:
       JWT_SECRET: $JWT_SECRET
       DYNAMODB_ENDPOINT: $DYNAMODB_ENDPOINT
