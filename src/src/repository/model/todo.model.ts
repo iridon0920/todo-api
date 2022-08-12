@@ -1,6 +1,8 @@
 export interface TodoModel {
-  id: string
+  // プライマリキー
+  pk: string
+  // ソートキー（Userのpkが入る）
+  sk: string
   title: string
   content: string
-  userId: string
 }

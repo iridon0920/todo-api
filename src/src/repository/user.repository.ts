@@ -6,19 +6,22 @@ import {
   DeleteCommand,
   GetCommand,
   PutCommand,
-  ScanCommand,
+  QueryCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { documentClient } from './function/db-client'
-import { USERS_TABLE_NAME } from './function/create-dynamo-local-table'
+import { TABLE_NAME } from './function/create-dynamo-local-table'
 import { UserModel } from './model/user.model'
+
+export const USER_SK = 'User'
 
 export class UserRepository {
   async findById(userId: string) {
     const command = new GetCommand({
-      TableName: USERS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: userId,
+        pk: userId,
+        sk: USER_SK,
       },
     })
     const output = await documentClient.send(command)
@@ -28,14 +31,15 @@ export class UserRepository {
     }
 
     const userModel = output.Item as UserModel
-    return new User(userModel.id, new Email(userModel.email), userModel.name)
+    return new User(userModel.pk, new Email(userModel.email), userModel.name)
   }
 
   async findHashPasswordById(userId: string): Promise<string | undefined> {
     const command = new GetCommand({
-      TableName: USERS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: userId,
+        pk: userId,
+        sk: USER_SK,
       },
     })
     const output = await documentClient.send(command)
@@ -44,9 +48,10 @@ export class UserRepository {
 
   async create(user: User, password: Password) {
     const command = new PutCommand({
-      TableName: USERS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Item: {
-        id: user.getId(),
+        pk: user.getId(),
+        sk: USER_SK,
         email: user.getEmail().toString(),
         name: user.getName(),
         password: await password.getHash(),
@@ -58,9 +63,10 @@ export class UserRepository {
 
   async update(user: User) {
     const command = new UpdateCommand({
-      TableName: USERS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: user.getId(),
+        pk: user.getId(),
+        sk: USER_SK,
       },
       UpdateExpression: 'set #n = :userName',
       ExpressionAttributeNames: {
@@ -76,9 +82,10 @@ export class UserRepository {
 
   async delete(userId: string) {
     const command = new DeleteCommand({
-      TableName: USERS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: userId,
+        pk: userId,
+        sk: USER_SK,
       },
     })
 
@@ -86,11 +93,15 @@ export class UserRepository {
   }
 
   async findEmailCount(email: string) {
-    const command = new ScanCommand({
-      TableName: USERS_TABLE_NAME,
-      FilterExpression: 'email = :email',
+    const command = new QueryCommand({
+      TableName: TABLE_NAME,
+      IndexName: 'EmailIndex',
+      KeyConditionExpression: '#indexKey = :indexValue',
+      ExpressionAttributeNames: {
+        '#indexKey': 'email',
+      },
       ExpressionAttributeValues: {
-        ':email': email,
+        ':indexValue': email,
       },
     })
 

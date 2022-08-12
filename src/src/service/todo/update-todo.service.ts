@@ -23,7 +23,7 @@ export class UpdateTodoService {
       todo.changeContent(param.content)
     }
 
-    await this.todoRepository.update(todo)
+    await this.todoRepository.update(todo, userId)
 
     return todo
   }

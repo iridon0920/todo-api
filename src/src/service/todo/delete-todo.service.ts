@@ -14,6 +14,6 @@ export class DeleteTodoService {
       )
     }
 
-    await this.todoRepository.delete(todoId)
+    await this.todoRepository.delete(todoId, userId)
   }
 }

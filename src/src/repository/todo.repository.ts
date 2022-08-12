@@ -3,27 +3,30 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 import { SearchTodoParam } from '../dto/request/todo/search-todo-param'
 import {
   DeleteCommand,
-  GetCommand,
   PutCommand,
+  QueryCommand,
   ScanCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { documentClient } from './function/db-client'
-import { TODOS_TABLE_NAME } from './function/create-dynamo-local-table'
 import { TodoModel } from './model/todo.model'
+import { TABLE_NAME } from './function/create-dynamo-local-table'
+import { USER_SK } from './user.repository'
 
 export class TodoRepository {
   async findByParam(param: SearchTodoParam) {
     const command = new ScanCommand({
-      TableName: TODOS_TABLE_NAME,
+      TableName: TABLE_NAME,
     })
     const output = await documentClient.send(command)
-    const todoModels = output.Items as TodoModel[]
+    const todoModels = output.Items.filter(
+      (item) => item.sk !== USER_SK,
+    ) as TodoModel[]
 
     return todoModels
       .filter((todo) => {
         if (param.userId) {
-          return todo.userId === param.userId
+          return todo.sk === param.userId
         }
         return true
       })
@@ -35,54 +38,56 @@ export class TodoRepository {
       })
       .map((todoModel) => {
         return new Todo(
-          todoModel.id,
+          todoModel.pk,
           todoModel.title,
           todoModel.content,
-          todoModel.userId,
+          todoModel.sk,
         )
       })
   }
 
   async findById(todoId: string) {
-    const command = new GetCommand({
-      TableName: TODOS_TABLE_NAME,
-      Key: {
-        id: todoId,
+    const command = new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'pk = :todoId',
+      ExpressionAttributeValues: {
+        ':todoId': todoId,
       },
     })
     const output = await documentClient.send(command)
-    if (output.Item === undefined) {
+    if (output.Items.length === 0) {
       throw new HttpException('Todoが見つかりません。', HttpStatus.NOT_FOUND)
     }
 
-    const todoModel = output.Item as TodoModel
+    const todoModel = output.Items[0] as TodoModel
     return new Todo(
-      todoModel.id,
+      todoModel.pk,
       todoModel.title,
       todoModel.content,
-      todoModel.userId,
+      todoModel.sk,
     )
   }
 
   async create(todo: Todo) {
     const command = new PutCommand({
-      TableName: TODOS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Item: {
-        id: todo.getId(),
+        pk: todo.getId(),
         title: todo.getTitle(),
         content: todo.getContent(),
-        userId: todo.getUserId(),
+        sk: todo.getUserId(),
       },
     })
 
     await documentClient.send(command)
   }
 
-  async update(todo: Todo) {
+  async update(todo: Todo, userId) {
     const command = new UpdateCommand({
-      TableName: TODOS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: todo.getId(),
+        pk: todo.getId(),
+        sk: userId,
       },
       UpdateExpression: 'Set title = :title, content = :content',
       ExpressionAttributeValues: {
@@ -94,11 +99,12 @@ export class TodoRepository {
     await documentClient.send(command)
   }
 
-  async delete(todoId: string) {
+  async delete(todoId: string, userId) {
     const command = new DeleteCommand({
-      TableName: TODOS_TABLE_NAME,
+      TableName: TABLE_NAME,
       Key: {
-        id: todoId,
+        pk: todoId,
+        sk: userId,
       },
     })
 

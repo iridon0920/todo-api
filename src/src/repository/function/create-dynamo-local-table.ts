@@ -1,48 +1,44 @@
 import { dbClient } from './db-client'
 import { CreateTableCommand, ListTablesCommand } from '@aws-sdk/client-dynamodb'
 
-export const USERS_TABLE_NAME = 'users'
-export const TODOS_TABLE_NAME = 'todos'
+export const TABLE_NAME = 'todo-api'
 
 export const createDynamoLocalTable = async () => {
   const command = new ListTablesCommand({})
   const output = await dbClient.send(command)
-  if (!output.TableNames.includes(USERS_TABLE_NAME)) {
-    await createUsersTable()
+  if (!output.TableNames.includes(TABLE_NAME)) {
+    const createCommand = new CreateTableCommand({
+      TableName: TABLE_NAME,
+      KeySchema: [
+        { AttributeName: 'pk', KeyType: 'HASH' },
+        { AttributeName: 'sk', KeyType: 'RANGE' },
+      ],
+      AttributeDefinitions: [
+        { AttributeName: 'pk', AttributeType: 'S' },
+        { AttributeName: 'sk', AttributeType: 'S' },
+        { AttributeName: 'email', AttributeType: 'S' },
+      ],
+      GlobalSecondaryIndexes: [
+        {
+          IndexName: 'EmailIndex',
+          KeySchema: [{ AttributeName: 'email', KeyType: 'HASH' }],
+          Projection: {
+            ProjectionType: 'ALL',
+          },
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          },
+        },
+      ],
+      ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1,
+      },
+      StreamSpecification: {
+        StreamEnabled: false,
+      },
+    })
+    await dbClient.send(createCommand)
   }
-  if (!output.TableNames.includes(TODOS_TABLE_NAME)) {
-    await createTodosTable()
-  }
-}
-
-const createUsersTable = async () => {
-  const createCommand = new CreateTableCommand({
-    TableName: USERS_TABLE_NAME,
-    KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
-    AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 1,
-      WriteCapacityUnits: 1,
-    },
-    StreamSpecification: {
-      StreamEnabled: false,
-    },
-  })
-  await dbClient.send(createCommand)
-}
-
-const createTodosTable = async () => {
-  const command = new CreateTableCommand({
-    TableName: TODOS_TABLE_NAME,
-    KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
-    AttributeDefinitions: [{ AttributeName: 'id', AttributeType: 'S' }],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 1,
-      WriteCapacityUnits: 1,
-    },
-    StreamSpecification: {
-      StreamEnabled: false,
-    },
-  })
-  await dbClient.send(command)
 }
