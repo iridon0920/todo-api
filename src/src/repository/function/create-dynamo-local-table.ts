@@ -6,7 +6,10 @@ export const TABLE_NAME = 'todo-api'
 export const createDynamoLocalTable = async () => {
   const command = new ListTablesCommand({})
   const output = await dbClient.send(command)
-  if (!output.TableNames.includes(TABLE_NAME)) {
+  if (
+    output.TableNames !== undefined &&
+    !output.TableNames.includes(TABLE_NAME)
+  ) {
     const createCommand = new CreateTableCommand({
       TableName: TABLE_NAME,
       KeySchema: [

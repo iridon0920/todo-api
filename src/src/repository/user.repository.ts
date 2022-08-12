@@ -106,6 +106,6 @@ export class UserRepository {
     })
 
     const result = await documentClient.send(command)
-    return result.Count
+    return result.Count ? result.Count : 0
   }
 }

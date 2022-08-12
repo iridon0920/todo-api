@@ -19,6 +19,11 @@ export class TodoRepository {
       TableName: TABLE_NAME,
     })
     const output = await documentClient.send(command)
+
+    if (output.Items === undefined) {
+      return []
+    }
+
     const todoModels = output.Items.filter(
       (item) => item.sk !== USER_SK,
     ) as TodoModel[]
@@ -55,7 +60,7 @@ export class TodoRepository {
       },
     })
     const output = await documentClient.send(command)
-    if (output.Items.length === 0) {
+    if (output.Items === undefined) {
       throw new HttpException('Todoが見つかりません。', HttpStatus.NOT_FOUND)
     }
 
