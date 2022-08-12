@@ -60,7 +60,7 @@ export class TodoRepository {
       },
     })
     const output = await documentClient.send(command)
-    if (output.Items === undefined) {
+    if (output.Items === undefined || output.Items.length === 0) {
       throw new HttpException('Todoが見つかりません。', HttpStatus.NOT_FOUND)
     }
 

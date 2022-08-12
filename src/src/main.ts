@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import serverlessExpress from '@vendia/serverless-express'
+import { configure as serverlessExpress } from '@vendia/serverless-express'
 import { Callback, Context, Handler } from 'aws-lambda'
 import { createDynamoLocalTable } from './repository/function/create-dynamo-local-table'
 
@@ -8,7 +8,6 @@ let server: Handler
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  await app.listen(3000)
   await app.init()
 
   const expressApp = app.getHttpAdapter().getInstance()
