@@ -1,0 +1,154 @@
+openapi: 3.1.0
+x-stoplight:
+  id: r5pcu6kbmatm3
+info:
+  title: TodoApi
+  version: '1.0'
+  description: '  '
+servers: []
+paths:
+  /user:
+    post:
+      summary: 新規ユーザ作成
+      operationId: post-user
+      responses:
+        '201':
+          description: 作成完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: サーバ側でUUIDで生成したID
+                  name:
+                    type: string
+                  email:
+                    type: string
+        '400':
+          description: リクエストパラメータに何らかの問題あり
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                  message:
+                    type: string
+      description: |-
+        新しいユーザを作成します。
+        既に登録しているメールアドレスは使用できません。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+                email:
+                  type: string
+                  format: email
+                  description: |-
+                    一般的なメールアドレスの形式に準拠している必要があります。
+                    ローカル部分は最大64文字まで、ドメイン部分は最大253文字までです。
+                  maxLength: 256
+                password:
+                  type: string
+                  minLength: 8
+              required:
+                - name
+                - email
+                - password
+    get:
+      summary: 認証ユーザ情報取得
+      operationId: get-user
+      responses:
+        '200':
+          description: 取得完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+      description: トークンで認証したユーザの情報を取得します。
+      security:
+        - API Key - 1: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+    patch:
+      summary: 認証ユーザ情報更新
+      operationId: patch-user
+      responses:
+        '200':
+          description: 更新完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  '':
+                    type: string
+      description: トークンで認証したユーザの情報を更新します。
+      security:
+        - API Key - 1: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+              required:
+                - name
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+    delete:
+      summary: 認証ユーザ情報削除
+      operationId: delete-user
+      responses:
+        '200':
+          description: 削除完了
+      description: トークンで認証したユーザの情報を削除します。
+      security:
+        - API Key - 1: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+components:
+  schemas: {}
+  securitySchemes:
+    API Key - 1:
+      name: API Key
+      type: apiKey
+      in: header
+      description: ''
+  parameters:
+    Authorization-Header:
+      name: Authorization Header
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer <token>
+      description: Bearer認証を行うためのトークンを記述する
+security:
+  - API Key - 1: []
