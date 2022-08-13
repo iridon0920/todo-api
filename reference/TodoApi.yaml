@@ -17,15 +17,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: サーバ側でUUIDで生成したID
-                  name:
-                    type: string
-                  email:
-                    type: string
+                $ref: '#/components/schemas/user'
         '400':
           description: リクエストパラメータに何らかの問題あり
           content:
@@ -47,16 +39,9 @@ paths:
               type: object
               properties:
                 name:
-                  type: string
-                  minLength: 1
-                  maxLength: 30
+                  $ref: '#/components/schemas/userName'
                 email:
-                  type: string
-                  format: email
-                  description: |-
-                    一般的なメールアドレスの形式に準拠している必要があります。
-                    ローカル部分は最大64文字まで、ドメイン部分は最大253文字までです。
-                  maxLength: 256
+                  $ref: '#/components/schemas/email'
                 password:
                   type: string
                   minLength: 8
@@ -64,6 +49,7 @@ paths:
                 - name
                 - email
                 - password
+        description: ''
     get:
       summary: 認証ユーザ情報取得
       operationId: get-user
@@ -73,14 +59,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  name:
-                    type: string
-                  email:
-                    type: string
+                $ref: '#/components/schemas/user'
       description: トークンで認証したユーザの情報を取得します。
       security:
         - API Key - 1: []
@@ -95,16 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  name:
-                    type: string
-                  email:
-                    type: string
-                  '':
-                    type: string
+                $ref: '#/components/schemas/user'
       description: トークンで認証したユーザの情報を更新します。
       security:
         - API Key - 1: []
@@ -115,9 +85,7 @@ paths:
               type: object
               properties:
                 name:
-                  type: string
-                  minLength: 1
-                  maxLength: 30
+                  $ref: '#/components/schemas/userName'
               required:
                 - name
       parameters:
@@ -133,8 +101,151 @@ paths:
         - API Key - 1: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
+  /todos:
+    get:
+      summary: Todo 検索
+      tags: []
+      responses:
+        '200':
+          description: 検索結果の取得完了
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/todo'
+      operationId: get-todos
+      description: サーバに保存されている全てのTodoを検索パラメータに従って取得します。
+      security:
+        - API Key - 1: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+        - schema:
+            type: string
+          in: query
+          name: title
+          description: Todoのタイトル。前方一致で検索。
+        - schema:
+            type: string
+            format: uuid
+          in: query
+          name: userId
+          description: ユーザID。完全一致で検索。
+    post:
+      summary: 新規Todo作成
+      operationId: post-todos
+      responses:
+        '200':
+          description: OK
+      description: 認証ユーザに紐づく新しいTodoを作成します。
+    patch:
+      summary: Todo更新
+      operationId: patch-todos
+      responses:
+        '200':
+          description: OK
+      description: Idで指定したTodoを更新します。他ユーザが作成したTodoは更新できません。
+    delete:
+      summary: Todo削除
+      operationId: delete-todos
+      responses:
+        '200':
+          description: 削除完了
+      description: Idで指定したTodoを削除します。他ユーザが作成したTodoは削除できません。
+  '/todos/{todoId}':
+    parameters:
+      - schema:
+          type: string
+        name: todoId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: Todo情報の取得
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todo'
+      operationId: get-todos-todoId
+      security:
+        - API Key - 1: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+  /auth/login:
+    parameters: []
+    post:
+      summary: ユーザログイン
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: OK
 components:
-  schemas: {}
+  schemas:
+    user:
+      title: user
+      x-stoplight:
+        id: 2kf56o0mkzed5
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        name:
+          $ref: '#/components/schemas/userName'
+        email:
+          $ref: '#/components/schemas/email'
+    userName:
+      type: string
+      title: ユーザ名
+      x-stoplight:
+        id: 3a6e0hdg8m7om
+      minLength: 1
+      maxLength: 30
+    email:
+      type: string
+      title: email
+      x-stoplight:
+        id: 80g94yz9qeeph
+      description: |-
+        一般的なメールアドレスの形式に準拠している必要があります。
+        ローカル部分は最大64文字まで、ドメイン部分は最大253文字までです。
+      maxLength: 256
+      format: email
+    todo:
+      title: todo
+      x-stoplight:
+        id: rb7p0rkqmedyk
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        title:
+          $ref: '#/components/schemas/todoTitle'
+        content:
+          $ref: '#/components/schemas/todoContent'
+    todoTitle:
+      type: string
+      title: todoTitle
+      x-stoplight:
+        id: eluyajbaa3yx4
+      minLength: 1
+      maxLength: 500
+    todoContent:
+      type: string
+      title: todoContent
+      x-stoplight:
+        id: 0sk40vj0g89hi
+      minLength: 1
+      maxLength: 15000
+    id:
+      type: string
+      title: id
+      x-stoplight:
+        id: e86h20qy8gxq7
+      format: uuid
+      description: サーバにて生成したUUID
   securitySchemes:
     API Key - 1:
       name: API Key
@@ -150,5 +261,6 @@ components:
         type: string
         example: Bearer <token>
       description: Bearer認証を行うためのトークンを記述する
+  requestBodies: {}
 security:
   - API Key - 1: []
