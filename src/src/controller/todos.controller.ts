@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common'
@@ -75,7 +76,7 @@ export class TodosController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async search(@Body() param: SearchTodoParam) {
+  async search(@Query() param: SearchTodoParam) {
     const todos = await this.searchTodoService.execute(param)
     return todos.map((todo) => convertToTodoResponse(todo))
   }

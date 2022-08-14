@@ -177,7 +177,7 @@ describe('TodosController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .get('/todos')
       .set('Authorization', `Bearer ${jwtToken}`)
-      .send({
+      .query({
         title: '水',
       })
       .expect(200)
@@ -205,7 +205,7 @@ describe('TodosController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .get('/todos')
       .set('Authorization', `Bearer ${jwtToken}`)
-      .send({
+      .query({
         userId: user2Id,
       })
       .expect(200)
