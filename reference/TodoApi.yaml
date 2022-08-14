@@ -5,7 +5,13 @@ info:
   title: TodoApi
   version: '1.0'
   description: '  '
-servers: []
+  contact:
+    name: iridon0920
+    url: 'https://github.com/iridon0920'
+    email: iridon0920@gmail.com
+servers:
+  - url: 'http://localhost:3000'
+    description: ローカル環境で稼働時のURL
 paths:
   /user:
     post:
@@ -43,8 +49,7 @@ paths:
                 email:
                   $ref: '#/components/schemas/email'
                 password:
-                  type: string
-                  minLength: 8
+                  $ref: '#/components/schemas/password'
               required:
                 - name
                 - email
@@ -60,9 +65,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/user'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       description: トークンで認証したユーザの情報を取得します。
       security:
-        - API Key - 1: []
+        - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
     patch:
@@ -75,9 +82,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/user'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       description: トークンで認証したユーザの情報を更新します。
       security:
-        - API Key - 1: []
+        - oauth2: []
       requestBody:
         content:
           application/json:
@@ -96,15 +105,16 @@ paths:
       responses:
         '200':
           description: 削除完了
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       description: トークンで認証したユーザの情報を削除します。
       security:
-        - API Key - 1: []
+        - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
   /todos:
     get:
       summary: Todo 検索
-      tags: []
       responses:
         '200':
           description: 検索結果の取得完了
@@ -114,10 +124,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/todo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       operationId: get-todos
       description: サーバに保存されている全てのTodoを検索パラメータに従って取得します。
       security:
-        - API Key - 1: []
+        - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
         - schema:
@@ -136,22 +148,24 @@ paths:
       operationId: post-todos
       responses:
         '200':
-          description: OK
+          description: 作成完了
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
       description: 認証ユーザに紐づく新しいTodoを作成します。
-    patch:
-      summary: Todo更新
-      operationId: patch-todos
-      responses:
-        '200':
-          description: OK
-      description: Idで指定したTodoを更新します。他ユーザが作成したTodoは更新できません。
-    delete:
-      summary: Todo削除
-      operationId: delete-todos
-      responses:
-        '200':
-          description: 削除完了
-      description: Idで指定したTodoを削除します。他ユーザが作成したTodoは削除できません。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/todoTitle'
+                content:
+                  $ref: '#/components/schemas/todoContent'
   '/todos/{todoId}':
     parameters:
       - schema:
@@ -159,9 +173,9 @@ paths:
         name: todoId
         in: path
         required: true
+        description: TodoのID
     get:
-      summary: Your GET endpoint
-      tags: []
+      summary: Todo情報取得
       responses:
         '200':
           description: Todo情報の取得
@@ -169,11 +183,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/todo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/Not-Found'
       operationId: get-todos-todoId
       security:
-        - API Key - 1: []
+        - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
+      description: Idで指定したTodo情報を取得します。他ユーザの作成したTodoの情報も取得可能です。
+    delete:
+      summary: Todo情報削除
+      operationId: delete-todos-todoId
+      responses:
+        '200':
+          description: 削除完了
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/Not-Found'
+      description: Idで指定したTodoを削除します。他ユーザが作成したTodoは削除できません。
+    patch:
+      summary: Todo情報更新
+      operationId: patch-todos-todoId
+      responses:
+        '200':
+          description: '更新完了  '
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/Not-Found'
+      description: Idで指定したTodoを更新します。他ユーザが作成したTodoは更新できません。
+      security:
+        - oauth2: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/todoTitle'
+                content:
+                  $ref: '#/components/schemas/todoContent'
   /auth/login:
     parameters: []
     post:
@@ -181,7 +239,40 @@ paths:
       operationId: post-auth-login
       responses:
         '200':
-          description: OK
+          description: ログイン完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: '401'
+                  message:
+                    type: string
+                    example: ユーザ認証に失敗しました。
+      description: 指定したユーザIDでのログインを行います。ログインが成功した場合、各リクエストで認証に使用するためのトークンが返ってきます。
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  $ref: '#/components/schemas/id'
+                password:
+                  $ref: '#/components/schemas/password'
+        description: ''
 components:
   schemas:
     user:
@@ -213,6 +304,13 @@ components:
         ローカル部分は最大64文字まで、ドメイン部分は最大253文字までです。
       maxLength: 256
       format: email
+    password:
+      type: string
+      title: password
+      x-stoplight:
+        id: vi2teciia5kgq
+      minLength: 8
+      format: password
     todo:
       title: todo
       x-stoplight:
@@ -247,10 +345,13 @@ components:
       format: uuid
       description: サーバにて生成したUUID
   securitySchemes:
-    API Key - 1:
-      name: API Key
-      type: apiKey
-      in: header
+    oauth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: 'http://localhost:3000/auth/login'
+          refreshUrl: ''
+          scopes: {}
       description: ''
   parameters:
     Authorization-Header:
@@ -262,5 +363,32 @@ components:
         example: Bearer <token>
       description: Bearer認証を行うためのトークンを記述する
   requestBodies: {}
-security:
-  - API Key - 1: []
+  responses:
+    Unauthorized:
+      description: トークンによる認証の失敗
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: number
+                example: 401
+              message:
+                type: string
+                example: Unauthorized
+      headers: {}
+    Not-Found:
+      description: 指定したIDに該当するデータが存在しない。
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: string
+                example: '404'
+              message:
+                type: string
+                example: 指定したデータが見つかりません。
+  examples: {}
