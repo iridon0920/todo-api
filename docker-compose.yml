@@ -4,8 +4,6 @@ services:
     build:
       context: .
     working_dir: /app
-    volumes:
-      - ./src:/app
     tty: true
     ports:
       - "3000:3000"
