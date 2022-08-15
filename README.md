@@ -204,6 +204,7 @@ docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-co
 ### 概要
 * CLIからの操作により、AWS上でもアプリケーションを稼働させられるようにしてあります。
 * インフラ環境の定義、デプロイにはAWS CDKを使用しています。
+* APIリクエストの窓口としてAPI Gateway、アプリケーション実行環境としてLambda、データの永続化先としてDynamoDBを使用しています。
 * 手動デプロイだけでなく、このリポジトリのmasterブランチにコミットがpushされるのをトリガーに、GitHub Actionsのワークフローが実行され、アプリケーションのテストとAWSへのデプロイが自動的に行われる仕組みになっています。
 
 ### 手動デプロイ手順
