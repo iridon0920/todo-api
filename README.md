@@ -20,7 +20,7 @@
 ### src
 * Todo APIアプリケーションソースコード
 * NestJSフレームワークにて開発
-* アプリケーションの構成などの説明は[このディレクトリのREADME](./tree/master/src#readme)参照
+* アプリケーションの構成などの説明は[このディレクトリのREADME](https://github.com/iridon0920/todo-api/tree/master/src#readme)参照
 
 ## ローカル環境での使用方法
 
