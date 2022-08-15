@@ -41,9 +41,11 @@ jobs:
       - name: Global Install NestJS
         run: npm install -g @nestjs/cli
       - name: Install App Node Module
-        run: npm --prefix src install --production
+        run: npm --prefix src install
       - name: Build App
         run: npm --prefix src run build
+      - name: ReInstall App Node Module Production
+        run: npm --prefix src install --production
       - name: Assume Role
         uses: aws-actions/configure-aws-credentials@v1
         with:
