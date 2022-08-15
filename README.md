@@ -3,6 +3,9 @@
 - [概要](#概要)
 - [主要ディレクトリ説明](#主要ディレクトリ説明)
 - [ローカル環境での使用方法](#ローカル環境での使用方法)
+  - [REST APIの使用例](#rest-api-の使用例)
+  - [E2Eテスト実行コマンド](#E2Eテスト実行コマンド)
+  - [ユニットテスト実行コマンド](#ユニットテスト実行コマンド)
 - [AWSでの稼働について](#AWSでの稼働について)
 
 ## 概要
@@ -186,12 +189,12 @@ curl -L -X GET 'http://localhost:3000/todos?title=買う' \
 ]
 ```
 
-### 自動テスト(e2eテスト)実行コマンド
+### E2Eテスト実行コマンド
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up --abort-on-container-exit
 ```
 
-### 自動テスト（ユニットテスト）実行コマンド
+### ユニットテスト実行コマンド
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
 ```
