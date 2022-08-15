@@ -38,7 +38,7 @@ jobs:
           cache: npm
       - name: Install AWS CDK Node Module
         run: npm install
-      - nmae: Install App Node Module
+      - name: Install App Node Module
         run: npm --prefix src install --production
       - name: Build App
         run: npm --prefix src run build
