@@ -38,6 +38,8 @@ jobs:
           cache: npm
       - name: Install AWS CDK Node Module
         run: npm install
+      - name: Global Install NestJS
+        run: npm install -g @nestjs/cli
       - name: Install App Node Module
         run: npm --prefix src install --production
       - name: Build App
