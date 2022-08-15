@@ -3,10 +3,10 @@
 - [概要](#概要)
 - [主要ディレクトリ説明](#主要ディレクトリ説明)
 - [ローカル環境での使用方法](#ローカル環境での使用方法)
-  - [REST APIの使用例](#rest-api-の使用例)
-  - [E2Eテスト実行コマンド](#E2Eテスト実行コマンド)
+  - [REST API の使用例](#rest-api-の使用例)
+  - [E2E テスト実行コマンド](#E2Eテスト実行コマンド)
   - [ユニットテスト実行コマンド](#ユニットテスト実行コマンド)
-- [AWSでの稼働について](#AWSでの稼働について)
+- [AWS での稼働について](#AWSでの稼働について)
 
 ## 概要
 
@@ -18,12 +18,14 @@
 ## 主要ディレクトリ説明
 
 ### lib
-* AWS CDKによるインフラ定義ソースコード
+
+- AWS CDK によるインフラ定義ソースコード
 
 ### src
-* Todo APIアプリケーションソースコード
-* NestJSフレームワークにて開発
-* アプリケーションの構成などの説明は[このディレクトリのREADME](https://github.com/iridon0920/todo-api/tree/master/src#readme)参照
+
+- Todo API アプリケーションソースコード
+- NestJS フレームワークにて開発
+- アプリケーションの構成などの説明は[このディレクトリの README](https://github.com/iridon0920/todo-api/tree/master/src#readme)参照
 
 ## ローカル環境での使用方法
 
@@ -75,7 +77,7 @@ curl -L -X POST 'http://localhost:3000/auth/login' \
 }
 ```
 
-* Todo作成
+- Todo 作成
 
 ```bash
 curl -L -X POST 'http://localhost:3000/todos' \
@@ -127,7 +129,7 @@ curl -L -X POST 'http://localhost:3000/todos' \
 }
 ```
 
-* Todo更新
+- Todo 更新
 
 ```bash
 curl -L -X PATCH 'http://localhost:3000/todos/2c5780ff-1037-4a1f-9bcc-8a838f9c8b71' \
@@ -146,7 +148,7 @@ curl -L -X PATCH 'http://localhost:3000/todos/2c5780ff-1037-4a1f-9bcc-8a838f9c8b
 }
 ```
 
-* Todo検索
+- Todo 検索
 
 ```bash
 curl -L -X GET 'http://localhost:3000/todos?title=買う' \
@@ -169,7 +171,7 @@ curl -L -X GET 'http://localhost:3000/todos?title=買う' \
 ]
 ```
 
-* Todo削除
+- Todo 削除
 
 ```bash
 curl -L -X DELETE 'http://localhost:3000/todos/34944e7b-2e30-4893-b4fa-70ff1a646414' \
@@ -189,27 +191,32 @@ curl -L -X GET 'http://localhost:3000/todos?title=買う' \
 ]
 ```
 
-### E2Eテスト実行コマンド
+### E2E テスト実行コマンド
+
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up --abort-on-container-exit
 ```
 
 ### ユニットテスト実行コマンド
+
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
 ```
 
-## AWSでの稼働について
+## AWS での稼働について
 
 ### 概要
-* CLIからの操作により、AWS上でもアプリケーションを稼働させられるようにしてあります。
-* インフラ環境の定義、デプロイにはAWS CDKを使用しています。
-* APIリクエストの窓口としてAPI Gateway、アプリケーション実行環境としてLambda、データの永続化先としてDynamoDBを使用しています。
-* 手動デプロイだけでなく、このリポジトリのmasterブランチにコミットがpushされるのをトリガーに、GitHub Actionsのワークフローが実行され、アプリケーションのテストとAWSへのデプロイが自動的に行われる仕組みになっています。
+
+- CLI からの操作により、AWS 上でもアプリケーションを稼働させられるようにしてあります。
+- インフラ環境の定義、デプロイには AWS CDK を使用しています。
+- API リクエストの窓口として API Gateway、アプリケーション実行環境として Lambda、データの永続化先として DynamoDB を使用しています。
+- 手動デプロイだけでなく、このリポジトリの master ブランチにコミットが push されるのをトリガーに、GitHub Actions のワークフローが実行され、アプリケーションのテストと AWS へのデプロイが自動的に行われる仕組みになっています。
 
 ### 手動デプロイ手順
-* AWS CLIにて認証情報を設定
-* `npx cdk deploy`コマンド実行
+
+- AWS CLI にて認証情報を設定
+- `npx cdk deploy`コマンド実行
 
 ### インフラ構成図
+
 ![](./reference/AWS%20Diagram.drawio.svg)
