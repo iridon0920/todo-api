@@ -180,3 +180,17 @@ docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up --abort-on-con
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
 ```
+
+## AWSでの稼働
+
+### 概要
+* CLIからの操作により、AWS上でもアプリケーションを稼働させられるようにしてあります。
+* インフラ環境の定義、デプロイにはAWS CDKを使用しています。
+* 手動デプロイだけでなく、このリポジトリのmasterブランチにコミットがpushされるのをトリガーに、GitHub Actionsのワークフローが実行され、アプリケーションのテストとAWSへのデプロイが自動的に行われる仕組みになっています。
+
+### 手動デプロイ手順
+* AWS CLIにて認証情報を設定
+* `npx cdk deploy`コマンド実行
+
+### インフラ構成図
+![](./reference/AWS%20Diagram.drawio.svg)
