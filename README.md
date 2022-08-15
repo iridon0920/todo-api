@@ -1,11 +1,26 @@
 # Todo API
 
+- [概要](#概要)
+- [主要ディレクトリ説明](#主要ディレクトリ説明)
+- [ローカル環境での使用方法](#ローカル環境での使用方法)
+- [AWSでの稼働について](#AWSでの稼働について)
+
 ## 概要
 
 - Todo アプリから使われることを想定した REST API です。
 - Todo データの作成、更新、情報取得、削除などが可能ですが、各エンドポイントへのアクセスにはトークンによる認証が必要となります。
 - 認証に使用するユーザデータの作成、更新、情報取得や、作成したユーザへのログインについてもこの API から行うことができます。
 - 各エンドポイントの詳細は[API 仕様ドキュメント](https://iridon0920.github.io/todo-api/api.html)を参照してください。
+
+## 主要ディレクトリ説明
+
+### lib
+* AWS CDKによるインフラ定義ソースコード
+
+### src
+* Todo APIアプリケーションソースコード
+* NestJSフレームワークにて開発
+* アプリケーションの構成などの説明は[このディレクトリのREADME](./tree/master/src#readme)参照
 
 ## ローカル環境での使用方法
 
@@ -181,7 +196,7 @@ docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up --abort-on-con
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
 ```
 
-## AWSでの稼働
+## AWSでの稼働について
 
 ### 概要
 * CLIからの操作により、AWS上でもアプリケーションを稼働させられるようにしてあります。
