@@ -52,4 +52,4 @@ jobs:
           role-to-assume: ${{ env.AWS_OIDC_ROLE_ARN }}
           aws-region: ${{env.AWS_REGION}}
       - name: CDK Deploy
-        run: cdk deploy
+        run: npx cdk deploy
