@@ -5,12 +5,12 @@ info:
   title: TodoApi
   version: '1.0'
   description: |-
-    このAPIは、Todoアプリから使われることを想定したREST APIです。
-    Todoデータの作成、更新、情報取得、削除などが可能ですが、各エンドポイントへのアクセスにはトークンによる認証が必要となります。
-    認証に使用するユーザデータの作成、更新、情報取得や、作成したユーザへのログインについてもこのAPIから行うことができます。
+    * このAPIは、Todoアプリから使われることを想定したREST APIです。
+    * Todoデータの作成、更新、情報取得、削除などが可能ですが、各エンドポイントへのアクセスにはトークンによる認証が必要となります。
+    * 認証に使用するユーザデータの作成、更新、情報取得や、作成したユーザへのログインについてもこのAPIから行うことができます。
   contact:
     name: iridon0920
-    url: 'https://github.com/iridon0920'
+    url: 'https://github.com/iridon0920/todo-api'
     email: iridon0920@gmail.com
   summary: Todo リスト用 REST API
 servers:
@@ -50,23 +50,6 @@ paths:
                 - email
                 - password
         description: ''
-    get:
-      summary: 認証ユーザ情報取得
-      operationId: get-user
-      responses:
-        '200':
-          description: 取得完了
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-      description: トークンで認証したユーザの情報を取得します。
-      security:
-        - oauth2: []
-      parameters:
-        - $ref: '#/components/parameters/Authorization-Header'
     patch:
       summary: 認証ユーザ情報更新
       operationId: patch-user
@@ -109,6 +92,96 @@ paths:
         - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
+  /users:
+    get:
+      summary: 全ユーザ情報取得
+      operationId: get-user
+      responses:
+        '200':
+          description: 取得完了
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/user'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      description: サーバに保存された全てのユーザの情報を取得します。
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: userId
+        in: path
+        required: true
+        description: ユーザID
+    get:
+      summary: ユーザ情報取得
+      tags: []
+      responses:
+        '200':
+          description: 取得完了
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/Not-Found'
+      operationId: get-users-userId
+      description: Idで指定したユーザ情報を取得します。他ユーザの情報も取得可能です。
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
+  /auth/login:
+    parameters: []
+    post:
+      summary: ユーザログイン
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: ログイン完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: '401'
+                  message:
+                    type: string
+                    example: ユーザ認証に失敗しました。
+      description: 指定したユーザIDでのログインを行います。ログインが成功した場合、各リクエストで認証に使用するためのトークンが返ってきます。
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  $ref: '#/components/schemas/id'
+                password:
+                  $ref: '#/components/schemas/password'
+        description: ''
   /todos:
     get:
       summary: Todo 検索
@@ -169,6 +242,7 @@ paths:
     parameters:
       - schema:
           type: string
+          format: uuid
         name: todoId
         in: path
         required: true
@@ -233,47 +307,6 @@ paths:
                   $ref: '#/components/schemas/todoTitle'
                 content:
                   $ref: '#/components/schemas/todoContent'
-  /auth/login:
-    parameters: []
-    post:
-      summary: ユーザログイン
-      operationId: post-auth-login
-      responses:
-        '200':
-          description: ログイン完了
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-        '401':
-          description: 認証失敗
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  statusCode:
-                    type: string
-                    example: '401'
-                  message:
-                    type: string
-                    example: ユーザ認証に失敗しました。
-      description: 指定したユーザIDでのログインを行います。ログインが成功した場合、各リクエストで認証に使用するためのトークンが返ってきます。
-      security: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
-                  $ref: '#/components/schemas/id'
-                password:
-                  $ref: '#/components/schemas/password'
-        description: ''
 components:
   schemas:
     user:
@@ -295,6 +328,7 @@ components:
         id: 3a6e0hdg8m7om
       minLength: 1
       maxLength: 30
+      example: TEST USER
     email:
       type: string
       title: email
@@ -331,6 +365,7 @@ components:
         id: eluyajbaa3yx4
       minLength: 1
       maxLength: 500
+      example: 卵を買う
     todoContent:
       type: string
       title: todoContent
@@ -338,6 +373,7 @@ components:
         id: 0sk40vj0g89hi
       minLength: 1
       maxLength: 15000
+      example: 近所のスーパーで購入すること
     id:
       type: string
       title: id
