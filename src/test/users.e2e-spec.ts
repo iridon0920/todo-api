@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common'
 import { TestingModule } from '@nestjs/testing'
-import { getTestModule } from './get-test-module'
-import { getInitApp } from './get-init-app'
-import { createDynamoLocalTable } from '../../src/repository/function/create-dynamo-local-table'
+import { getTestModule } from './function/get-test-module'
+import { getInitApp } from './function/get-init-app'
+import { createDynamoLocalTable } from '../src/repository/function/create-dynamo-local-table'
 import * as request from 'supertest'
 
 describe('UsersController (e2e)', () => {
