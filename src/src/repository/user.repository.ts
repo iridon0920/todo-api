@@ -7,6 +7,7 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  ScanCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { documentClient } from './function/db-client'
@@ -16,6 +17,26 @@ import { UserModel } from './model/user.model'
 export const USER_SK = 'User'
 
 export class UserRepository {
+  async findAll() {
+    const command = new ScanCommand({
+      TableName: TABLE_NAME,
+    })
+    const output = await documentClient.send(command)
+
+    if (output.Items === undefined) {
+      return []
+    }
+
+    const userModels = output.Items.filter(
+      (item) => item.sk === USER_SK,
+    ) as UserModel[]
+
+    return userModels.map(
+      (userModel) =>
+        new User(userModel.pk, new Email(userModel.email), userModel.name),
+    )
+  }
+
   async findById(userId: string) {
     const command = new GetCommand({
       TableName: TABLE_NAME,
