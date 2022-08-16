@@ -6,6 +6,9 @@ import { AuthLoginService } from '../auth/auth-login.service'
 export class AuthController {
   constructor(private readonly authLoginService: AuthLoginService) {}
 
+  /**
+   * ユーザログイン
+   */
   @Post('login')
   async login(@Body() param: AuthLoginParam) {
     const access_token = await this.authLoginService.execute(param)

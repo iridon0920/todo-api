@@ -25,12 +25,18 @@ export class UserController {
     private readonly deleteUserService: DeleteUserService,
   ) {}
 
+  /**
+   * 新規ユーザ作成
+   */
   @Post()
   async create(@Body() param: CreateUserParam): Promise<UserResponse> {
     const user = await this.createUserService.execute(param)
     return convertToUserResponse(user)
   }
 
+  /**
+   * 認証ユーザ情報更新
+   */
   @UseGuards(JwtAuthGuard)
   @Patch()
   async update(
@@ -44,6 +50,9 @@ export class UserController {
     return convertToUserResponse(user)
   }
 
+  /**
+   * 認証ユーザ情報削除
+   */
   @UseGuards(JwtAuthGuard)
   @Delete()
   async delete(@Request() request: AuthUserParam) {
