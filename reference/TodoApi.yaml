@@ -17,6 +17,47 @@ servers:
   - url: 'http://localhost:3000'
     description: ローカル環境で稼働時のURL
 paths:
+  /auth/login:
+    parameters: []
+    post:
+      summary: ユーザログイン
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: ログイン完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: '401'
+                  message:
+                    type: string
+                    example: ユーザ認証に失敗しました。
+      description: 指定したユーザIDでのログインを行います。ログインが成功した場合、各リクエストで認証に使用するためのトークンが返ってきます。
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  $ref: '#/components/schemas/id'
+                password:
+                  $ref: '#/components/schemas/password'
+        description: ''
   /user:
     post:
       summary: 新規ユーザ作成
@@ -141,47 +182,6 @@ paths:
         - oauth2: []
       parameters:
         - $ref: '#/components/parameters/Authorization-Header'
-  /auth/login:
-    parameters: []
-    post:
-      summary: ユーザログイン
-      operationId: post-auth-login
-      responses:
-        '200':
-          description: ログイン完了
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-        '401':
-          description: 認証失敗
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  statusCode:
-                    type: string
-                    example: '401'
-                  message:
-                    type: string
-                    example: ユーザ認証に失敗しました。
-      description: 指定したユーザIDでのログインを行います。ログインが成功した場合、各リクエストで認証に使用するためのトークンが返ってきます。
-      security: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
-                  $ref: '#/components/schemas/id'
-                password:
-                  $ref: '#/components/schemas/password'
-        description: ''
   /todos:
     get:
       summary: Todo 検索
@@ -238,6 +238,10 @@ paths:
                   $ref: '#/components/schemas/todoTitle'
                 content:
                   $ref: '#/components/schemas/todoContent'
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
   '/todos/{todoId}':
     parameters:
       - schema:
@@ -277,6 +281,10 @@ paths:
         '404':
           $ref: '#/components/responses/Not-Found'
       description: Idで指定したTodoを削除します。他ユーザが作成したTodoは削除できません。
+      security:
+        - oauth2: []
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
     patch:
       summary: Todo情報更新
       operationId: patch-todos-todoId
@@ -307,6 +315,8 @@ paths:
                   $ref: '#/components/schemas/todoTitle'
                 content:
                   $ref: '#/components/schemas/todoContent'
+      parameters:
+        - $ref: '#/components/parameters/Authorization-Header'
 components:
   schemas:
     user:
